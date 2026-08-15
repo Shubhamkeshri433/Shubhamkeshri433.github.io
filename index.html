@@ -1,105 +1,895 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shubham | Portfolio</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shubham Keshri — Data Scientist & Data Analyst | Portfolio</title>
+  <meta name="description"
+    content="Portfolio of Shubham Keshri — Data Scientist & Data Analyst specializing in SQL, Python, Machine Learning, and AI.">
+  <meta name="keywords"
+    content="Shubham Keshri, Data Scientist, Data Analyst, Machine Learning, Power BI, Python, SQL, NLP, 3D Portfolio">
+  <meta name="author" content="Shubham Keshri">
+
+  <!-- Open Graph / Meta -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Shubham Keshri — Data Scientist & Data Analyst">
+  <meta property="og:description"
+    content="Explore interactive data intelligence systems, AI models, and SQL architectures built by Shubham Keshri.">
+  <meta property="og:url" content="https://github.com/Shubhamkeshri433">
+
+  <!-- Google Fonts: Bebas Neue, Caveat, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@600;700&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/terminal.css">
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
+
 <body>
 
-    <header>
-        <nav>
-            <h2 class="logo">Shubham</h2>
-            <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#projects">Projects</a></li>
-                <li><a href="#skills">Skills</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
+  <!-- 3D Interactive WebGL Background Canvas -->
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- Foreground Application Layer -->
+  <div class="foreground-layer">
+
+    <!-- Top Sticky Header (Clean, Single Line, No Extra Spacing) -->
+    <header class="top-nav-bar">
+      <div class="container top-nav-inner">
+        <a href="#hero" class="top-nav-brand">
+          <span class="brand-spark">&#10022;</span>
+          <span class="brand-name">SHUBHAM KESHRI</span>
+          <span class="brand-role">DATA &bull; AI</span>
+        </a>
+
+        <ul class="nav-menu-links">
+          <li><a href="#hero" class="nav-menu-link">Home</a></li>
+          <li><a href="#skills-matrix" class="nav-menu-link">Skills</a></li>
+          <li><a href="#projects" class="nav-menu-link">Projects</a></li>
+          <li><a href="#overview-blocks" class="nav-menu-link">Process</a></li>
+          <li><a href="#terminal" class="nav-menu-link">Terminal</a></li>
+          <li><a href="#contact" class="nav-menu-link">Contact</a></li>
+        </ul>
+
+        <a href="#contact" class="nav-status-btn">
+          <span class="nav-status-star">&#10022;</span>
+          <span>HIRE</span>
+        </a>
+      </div>
     </header>
 
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h1>Hi, I'm <span>Shubham</span></h1>
-            <h2>Aspiring Data Analyst & Python Developer</h2>
-            <p>I build data-driven solutions using Python, Power BI, SQL, and AI.</p>
+    <!-- 1. Hero Section (About / Front Page Overview) -->
+    <section id="hero" class="hero-wrapper">
+      <!-- Giant Stylized "PORTFOLIO" Background Text -->
+      <div class="hero-giant-bg-text" aria-hidden="true">PORTFOLIO</div>
 
-            <a href="#projects" class="btn">View Projects</a>
-            <a href="resume.pdf" class="btn secondary">Download Resume</a>
+      <div class="container hero-main-layout">
+        <!-- Left Hero Typography Block -->
+        <div class="hero-left-block">
+          <div class="hero-script-tag">Hello, I'm</div>
+          <h1 class="hero-name-huge">
+            SHUBHAM<br>KESHRI
+          </h1>
+          <div class="hero-sub-title">DATA ANALYST &amp; AI DEVELOPER</div>
+
+          <p class="hero-bio-p">
+            I design and build robust data intelligence pipelines, and executive BI dashboards.
+            Passionate about clean data architectures, statistical modeling, and AI applications that drive
+            strategic decisions.
+          </p>
+
+          <div class="hero-location-pill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+            <span>OPEN FOR WORK &bull; WORLDWIDE</span>
+          </div>
+
+          <div class="hero-cta-group">
+            <a href="#skills-matrix" class="btn-crimson">
+              <span>View Skills &amp; Tech</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
+            <!-- <a href="#projects" class="btn-outline">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="4 17 10 11 4 5" />
+                <line x1="12" y1="19" x2="20" y2="19" />
+              </svg>
+              <span>Selected Projects</span>
+            </a> -->
+          </div>
         </div>
-    </section>
 
-    <section id="about" class="section">
-        <h2>About Me</h2>
-        <p>
-            I am passionate about Data Analytics, Python Development, AI,
-            and Business Intelligence. I enjoy transforming raw data into
-            meaningful insights and building practical projects.
-        </p>
-    </section>
+        <!-- Right Hero Visual & Stacked Stats Block -->
+        <div class="hero-right-block">
+          <div class="hero-quote-badge spotlight-card">
+            <div class="badge-spark">&#10022;</div>
+            <div class="badge-quote-text">Turning complex raw data into powerful intelligent experiences.</div>
+          </div>
 
-    <section id="projects" class="section">
-        <h2>Projects</h2>
-
-        <div class="project-grid">
-
-            <div class="card">
-                <h3>AI Resume Ranker</h3>
-                <p>
-                    NLP-based system that ranks resumes against job descriptions.
-                </p>
-                <a href="#">GitHub</a>
+          <div class="hero-stacked-stats" id="hero-stacked-stats">
+            <div class="stat-stack-row">
+              <div class="stat-stack-number" id="hero-stat-repos">6+</div>
+              <div class="stat-stack-desc">GITHUB REPOSITORIES<br>LIVE SYNCED</div>
             </div>
 
-            <div class="card">
-                <h3>Power BI Sales Dashboard</h3>
-                <p>
-                    Interactive dashboard for business performance analysis.
-                </p>
-                <a href="#">GitHub</a>
+            <div class="stat-stack-row">
+              <div class="stat-stack-number" id="hero-stat-ai">2+</div>
+              <div class="stat-stack-desc">AI &amp; ML<br>MODELS &amp; SYSTEMS</div>
             </div>
 
-            <div class="card">
-                <h3>Python Data Analysis</h3>
-                <p>
-                    Data cleaning, visualization and reporting using Python.
-                </p>
-                <a href="#">GitHub</a>
+            <div class="stat-stack-row">
+              <div class="stat-stack-number" id="hero-stat-analytics">4+</div>
+              <div class="stat-stack-desc">DATA &amp; BI<br>PIPELINES</div>
             </div>
 
+            <div class="stat-stack-row">
+              <div class="stat-stack-number" id="hero-stat-cgpa">7.35</div>
+              <div class="stat-stack-desc">CGPA SPECIALIZATION<br>IN DATA ANALYSIS</div>
+            </div>
+          </div>
         </div>
+      </div>
     </section>
 
-    <section id="skills" class="section">
-        <h2>Skills</h2>
-
-        <div class="skills">
-            <span>Python</span>
-            <span>Power BI</span>
-            <span>SQL</span>
-            <span>Excel</span>
-            <span>HTML</span>
-            <span>CSS</span>
-            <span>JavaScript</span>
-            <span>GitHub</span>
+    <!-- 2. Skills Section (Tech Stack & Skills Matrix Table with Logos) -->
+    <section id="skills-matrix" class="section-wrapper">
+      <div class="container">
+        <div class="section-head-bar">
+          <h2 class="section-main-heading">TECH STACK &amp; SKILLS MATRIX</h2>
+          <span
+            style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--crimson-bright); font-weight: 600;">VERIFIED
+            GITHUB CAPABILITIES</span>
         </div>
+
+        <div class="skills-table-container spotlight-card">
+          <table class="skills-theme-table" aria-label="Technical Skills Matrix">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Technologies &amp; Core Stack</th>
+                <th>Applied Methodologies</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Row 1: Programming -->
+              <tr>
+                <td class="skill-cat-cell">
+                  <div class="cat-badge-wrap">
+                    <span class="cat-icon-dot"></span>
+                    <span>Programming</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="skill-badges-table-flex">
+                    <!-- Python -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 128 128">
+                          <path fill="#3776AB"
+                            d="M63.4 3.7c-29.3 0-27.4 12.7-27.4 12.7l.03 13.1h27.8v3.9H25.3S3.7 31 3.7 60.5c0 29.4 18.9 28.4 18.9 28.4h11.3v-15.8s-.6-18.9 18.5-18.9h27.4s17.7.3 17.7-17.1V19.4S100 3.7 63.4 3.7zm-14.8 9c2.9 0 5.2 2.3 5.2 5.2 0 2.9-2.3 5.2-5.2 5.2s-5.2-2.3-5.2-5.2c0-2.9 2.3-5.2 5.2-5.2z" />
+                          <path fill="#FFD43B"
+                            d="M64.6 124.3c29.3 0 27.4-12.7 27.4-12.7l-.03-13.1H64.1v-3.9h38.6s21.6 2.4 21.6-27.1c0-29.4-18.9-28.4-18.9-28.4h-11.3v15.8s.6 18.9-18.5 18.9H47.7s-17.7-.3-17.7 17.1v17.7s-2.5 15.7 34.6 15.7zm14.8-9c-2.9 0-5.2-2.3-5.2-5.2 0-2.9 2.3-5.2 5.2-5.2s5.2 2.3 5.2 5.2c0 2.9-2.3 5.2-5.2 5.2z" />
+                        </svg>
+                      </div>
+                      <span>Python</span>
+                    </div>
+
+                    <!-- HTML5 -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#E34F26">
+                          <path
+                            d="M3 2l1.8 17.5L12 22l7.2-2.5L21 2H3zm14.8 5.7h-7.6l.2 2.3h7.2l-.6 6.3-4.6 1.3-4.6-1.3-.3-3.6h2.3l.1 1.8 2.5.7 2.5-.7.3-3H7.5l-.6-6.8h11.2l-.3 3z" />
+                        </svg>
+                      </div>
+                      <span>HTML5</span>
+                    </div>
+
+                    <!-- CSS3 -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#1572B6">
+                          <path
+                            d="M3 2l1.8 17.5L12 22l7.2-2.5L21 2H3zm14.7 4.5l-.2 2.3H8.3l.2 2.3h8.8l-.6 6.5-4.7 1.3-4.7-1.3-.3-3.6h2.3l.1 1.8 2.6.7 2.6-.7.3-3.2H6.9l-.6-7.1h11.7l-.3 2.3z" />
+                        </svg>
+                      </div>
+                      <span>CSS3</span>
+                    </div>
+
+                    <!-- JavaScript -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#F7DF1E">
+                          <rect width="24" height="24" rx="3" fill="#F7DF1E" />
+                          <path
+                            d="M7 17.5c.6.9 1.4 1.5 2.5 1.5 1.4 0 2.2-.8 2.2-2.7v-7.8h-2.1v7.8c0 .8-.3 1.2-.9 1.2-.5 0-.9-.3-1.2-.7l-.5.7zm7.5 1.5c2.3 0 3.7-1.4 3.7-3.4 0-1.9-1.2-2.8-2.6-3.4l-.8-.4c-.7-.3-1.1-.6-1.1-1.1 0-.6.5-1 1.2-1 .7 0 1.2.3 1.6.9l1.4-1c-.8-1.2-1.9-1.6-3-1.6-2 0-3.4 1.3-3.4 3.1 0 1.8 1.1 2.8 2.6 3.4l.8.4c.8.3 1.2.7 1.2 1.2 0 .7-.6 1.1-1.4 1.1-.9 0-1.6-.5-2-1.2l-1.4 1c.7 1.4 2 2 3.2 2z"
+                            fill="#000000" />
+                        </svg>
+                      </div>
+                      <span>JavaScript</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="skill-code-tag">Clean Architecture</span> &bull; <span class="skill-code-tag">OOP</span>
+                  &bull; <span class="skill-code-tag">Automation</span>
+                </td>
+              </tr>
+
+              <!-- Row 2: SQL & Databases -->
+              <tr>
+                <td class="skill-cat-cell">
+                  <div class="cat-badge-wrap">
+                    <span class="cat-icon-dot"></span>
+                    <span>SQL &amp; Databases</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="skill-badges-table-flex">
+                    <!-- MSSQL -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#CC292B">
+                          <ellipse cx="12" cy="5" rx="9" ry="3" fill="none" stroke="#CC292B" stroke-width="2" />
+                          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" fill="none" stroke="#CC292B" stroke-width="2" />
+                          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" fill="none" stroke="#CC292B" stroke-width="2" />
+                        </svg>
+                      </div>
+                      <span>MSSQL</span>
+                    </div>
+
+                    <!-- T-SQL -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#00F0FF">
+                          <path d="M4 6h16M12 6v14" stroke="#00F0FF" stroke-width="2.5" stroke-linecap="round" />
+                        </svg>
+                      </div>
+                      <span>T-SQL</span>
+                    </div>
+
+                    <!-- MySQL -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#4479A1">
+                          <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                        </svg>
+                      </div>
+                      <span>MySQL</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="skill-code-tag">CTEs &amp; Subqueries</span> &bull; <span class="skill-code-tag">Window
+                    Functions</span> &bull; <span class="skill-code-tag">Stored Procedures</span>
+                </td>
+              </tr>
+
+              <!-- Row 3: Data Analytics & BI -->
+              <tr>
+                <td class="skill-cat-cell">
+                  <div class="cat-badge-wrap">
+                    <span class="cat-icon-dot"></span>
+                    <span>Data Analytics &amp; BI</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="skill-badges-table-flex">
+                    <!-- Power BI -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#F2C811">
+                          <path
+                            d="M20 2H16C15.45 2 15 2.45 15 3V21C15 21.55 15.45 22 16 22H20C20.55 22 21 21.55 21 21V3C21 2.45 20.55 2 20 2ZM13 7H9C8.45 7 8 7.45 8 8V21C8 21.55 8.45 22 9 22H13C13.55 22 14 21.55 14 21V8C14 7.45 13.55 7 13 7ZM6 12H2C1.45 12 1 12.45 1 13V21C1 21.55 1.45 22 2 22H6C6.55 22 7 21.55 7 21V13C7 12.45 6.55 12 6 12Z" />
+                        </svg>
+                      </div>
+                      <span>Power BI</span>
+                    </div>
+
+                    <!-- Excel -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#217346">
+                          <rect x="3" y="3" width="18" height="18" rx="2" fill="#217346" />
+                          <path d="M8 8l8 8M16 8l-8 8" stroke="#ffffff" stroke-width="2.5" />
+                        </svg>
+                      </div>
+                      <span>Excel</span>
+                    </div>
+
+                    <!-- Pandas -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24">
+                          <rect x="3" y="3" width="7" height="18" rx="2" fill="#00F0FF" />
+                          <rect x="14" y="3" width="7" height="18" rx="2" fill="#E70488" />
+                          <rect x="3" y="10" width="18" height="4" fill="#150458" />
+                        </svg>
+                      </div>
+                      <span>Pandas</span>
+                    </div>
+
+                    <!-- NumPy -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="none" stroke="#4DABF7"
+                            stroke-width="2" />
+                        </svg>
+                      </div>
+                      <span>NumPy</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="skill-code-tag">EDA</span> &bull; <span class="skill-code-tag">DAX Formulas</span> &bull;
+                  <span class="skill-code-tag">Executive KPI Dashboards</span>
+                </td>
+              </tr>
+
+              <!-- Row 4: AI & Machine Learning -->
+              <tr>
+                <td class="skill-cat-cell">
+                  <div class="cat-badge-wrap">
+                    <span class="cat-icon-dot"></span>
+                    <span>AI / Machine Learning</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="skill-badges-table-flex">
+                    <!-- ML -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2">
+                          <rect x="4" y="4" width="16" height="16" rx="2" />
+                          <rect x="9" y="9" width="6" height="6" />
+                          <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" />
+                        </svg>
+                      </div>
+                      <span>Machine Learning</span>
+                    </div>
+
+                    <!-- NLP -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#00F0FF" stroke-width="2">
+                          <circle cx="12" cy="12" r="3" />
+                          <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12" />
+                        </svg>
+                      </div>
+                      <span>NLP &amp; Semantic Similarity</span>
+                    </div>
+
+                    <!-- RAG & Vector DBs -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2">
+                          <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                        </svg>
+                      </div>
+                      <span>RAG &amp; Vector Databases</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="skill-code-tag">Vector Embeddings</span> &bull; <span class="skill-code-tag">Prompt
+                    Engineering</span> &bull; <span class="skill-code-tag">Cosine Scoring</span>
+                </td>
+              </tr>
+
+              <!-- Row 5: AI Development & Agentic AI -->
+              <tr>
+                <td class="skill-cat-cell">
+                  <div class="cat-badge-wrap">
+                    <span class="cat-icon-dot"></span>
+                    <span>AI Development</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="skill-badges-table-flex">
+                    <!-- LangChain -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2">
+                          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                        </svg>
+                      </div>
+                      <span>LangChain</span>
+                    </div>
+
+                    <!-- Streamlit -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#FF4B4B">
+                          <path d="M14.5 12.5L12 8L9.5 12.5L4 3L12 21L20 3L14.5 12.5Z" />
+                        </svg>
+                      </div>
+                      <span>Streamlit</span>
+                    </div>
+
+                    <!-- PyTorch / TensorFlow -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#EE4C2C">
+                          <path
+                            d="M12 2a7 7 0 0 0-7 7c0 4.5 7 13 7 13s7-8.5 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" />
+                        </svg>
+                      </div>
+                      <span>PyTorch / TensorFlow</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="skill-code-tag">Agentic AI</span> &bull; <span class="skill-code-tag">AI Agents</span>
+                  &bull; <span class="skill-code-tag">LLM Applications</span>
+                </td>
+              </tr>
+
+              <!-- Row 6: Tools & Cloud -->
+              <tr>
+                <td class="skill-cat-cell">
+                  <div class="cat-badge-wrap">
+                    <span class="cat-icon-dot"></span>
+                    <span>Tools &amp; Deployment</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="skill-badges-table-flex">
+                    <!-- Git -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#F05032">
+                          <path
+                            d="M21.6 10.9L13.1 2.4c-.6-.6-1.5-.6-2.1 0L8.7 4.7l3.2 3.2c.4-.1.8 0 1.1.2.6.4.8 1.1.6 1.7l3.1 3.1c.6-.2 1.3 0 1.7.6.6.8.5 2-.4 2.6-.8.6-2 .5-2.6-.4-.4-.5-.4-1.2-.1-1.7l-2.9-2.9v4.5c.3.2.6.6.7 1 .4.9 0 2-.9 2.4-.9.4-2 0-2.4-.9-.4-.9 0-2 .9-2.4.4-.2.9-.2 1.3 0V9.4c-.4-.2-.8-.6-1-1-.4-.9 0-2 .9-2.4.5-.2 1-.2 1.5 0L8.6 2.7 2.4 8.9c-.6.6-.6 1.5 0 2.1l8.5 8.5c.6.6 1.5.6 2.1 0l8.6-8.5c.6-.6.6-1.5 0-2.1z" />
+                        </svg>
+                      </div>
+                      <span>Git &amp; GitHub</span>
+                    </div>
+
+                    <!-- Jupyter -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#F37626">
+                          <circle cx="12" cy="12" r="3" />
+                          <circle cx="5" cy="5" r="2" />
+                          <circle cx="19" cy="19" r="2" />
+                        </svg>
+                      </div>
+                      <span>Jupyter Notebook</span>
+                    </div>
+
+                    <!-- VS Code -->
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#007ACC">
+                          <path
+                            d="M23.15 2.587L18.21.21a1.494 1.494 0 0 0-1.705.29l-9.46 8.63-4.12-3.128a.999.999 0 0 0-1.276.057L.327 7.261a1 1 0 0 0-.004 1.488L4.31 12 .323 15.251a1 1 0 0 0 .004 1.488l1.322 1.202a.999.999 0 0 0 1.276.057l4.12-3.128 9.46 8.63a1.492 1.492 0 0 0 1.704.29l4.94-2.377A1.5 1.5 0 0 0 24 20.06V3.939a1.5 1.5 0 0 0-.85-1.352z" />
+                        </svg>
+                      </div>
+                      <span>VS Code</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="skill-code-tag">Model Deployment</span> &bull; <span class="skill-code-tag">Cloud
+                    Infrastructure</span> &bull; <span class="skill-code-tag">Version Control</span>
+                </td>
+              </tr>
+
+              <!-- Row 7: AI Productivity Tools -->
+              <tr>
+                <td class="skill-cat-cell">
+                  <div class="cat-badge-wrap">
+                    <span class="cat-icon-dot"></span>
+                    <span>AI Productivity Tools</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="skill-badges-table-flex">
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#D97706">
+                          <path
+                            d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                        </svg>
+                      </div>
+                      <span>Claude</span>
+                    </div>
+
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#10A37F">
+                          <circle cx="12" cy="12" r="9" fill="none" stroke="#10A37F" stroke-width="2" />
+                          <path d="M12 6v6l4 2" />
+                        </svg>
+                      </div>
+                      <span>ChatGPT</span>
+                    </div>
+
+                    <div class="skill-table-pill">
+                      <div class="skill-table-pill-logo">
+                        <svg viewBox="0 0 24 24" fill="#4285F4">
+                          <polygon points="12 2 15 9 22 12 15 15 12 22 9 15 2 12 9 9 12 2" />
+                        </svg>
+                      </div>
+                      <span>Gemini</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="skill-code-tag">AI Automation</span> &bull; <span class="skill-code-tag">Prompt
+                    Engineering</span> &bull; <span class="skill-code-tag">Research</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
-    <section id="contact" class="section">
-        <h2>Contact</h2>
+    <!-- 3. Selected Projects Section (Live GitHub Connected - Realigned after Skills) -->
+    <section id="projects" class="section-wrapper">
+      <div class="container">
+        <div class="section-head-bar">
+          <h2 class="section-main-heading">SELECTED PROJECTS</h2>
+          <a href="https://github.com/Shubhamkeshri433?tab=repositories" target="_blank" rel="noopener noreferrer"
+            class="section-head-link">
+            <span>VIEW ALL GITHUB REPOS</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
 
-        <p>Email: yourmail@example.com</p>
-        <p>LinkedIn: linkedin.com/in/yourprofile</p>
-        <p>GitHub: github.com/yourusername</p>
+        <!-- Live GitHub Sync & View Control Bar -->
+        <div class="github-sync-bar spotlight-card">
+          <div class="github-sync-status">
+            <span class="status-pulse"></span>
+            <span id="github-sync-timestamp">● Live GitHub Sync Active</span>
+          </div>
+
+          <div class="projects-toolbar-right">
+            <!-- Category Dropdown -->
+            <div class="project-dropdown-wrapper">
+              <select id="project-category-select" class="project-category-select" aria-label="Select Project Category">
+                <option value="all">📁 All Categories</option>
+                <option value="ai">🤖 AI &amp; NLP Systems</option>
+                <option value="analytics">📊 Data Analytics &amp; BI</option>
+                <option value="sql">🗄️ SQL &amp; Databases</option>
+                <option value="etl">🧹 Data Cleansing &amp; ETL</option>
+              </select>
+            </div>
+
+            <!-- View Switcher (Grid vs Accordion) -->
+            <div class="view-mode-toggle" role="group" aria-label="Project View Layout">
+              <button class="view-mode-btn active" id="view-mode-grid" type="button" title="Card Grid View"
+                aria-label="Grid View">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <rect x="3" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="14" width="7" height="7" rx="1" />
+                  <rect x="3" y="14" width="7" height="7" rx="1" />
+                </svg>
+                <span>Grid</span>
+              </button>
+              <button class="view-mode-btn" id="view-mode-accordion" type="button" title="Interactive Accordion View"
+                aria-label="Accordion View">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+                <span>Accordion</span>
+              </button>
+            </div>
+
+            <!-- GitHub Refresh Button -->
+            <button class="github-refresh-btn" id="github-sync-refresh-btn" type="button"
+              title="Sync latest repositories from GitHub API">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M23 4v6h-6" />
+                <path d="M1 20v-6h6" />
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+              </svg>
+              <span>Sync</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="project-filters">
+          <button class="project-filter-btn active" data-filter="all">All Repositories</button>
+          <button class="project-filter-btn" data-filter="ai">AI &amp; NLP Systems</button>
+          <button class="project-filter-btn" data-filter="analytics">Data Analytics &amp; BI</button>
+          <button class="project-filter-btn" data-filter="sql">SQL &amp; Databases</button>
+          <button class="project-filter-btn" data-filter="etl">Data Cleansing &amp; ETL</button>
+        </div>
+
+        <!-- Dynamic Projects Container (Supports Card Grid & Accordion Layouts) -->
+        <div class="projects-grid view-grid" id="projects-grid-container">
+          <!-- Dynamically populated from GitHub API via js/github-sync.js -->
+        </div>
+      </div>
     </section>
 
-    <footer>
-        <p>© 2026 Shubham. All Rights Reserved.</p>
+    <!-- 4. Structured 3-Column Section Blocks (Work Process, Education & Highlights, Crimson Quote) -->
+    <section id="overview-blocks" class="section-wrapper">
+      <div class="container">
+        <div class="structured-three-col-grid">
+
+          <!-- Block 1: Education & Skills -->
+          <div class="block-card spotlight-card">
+            <h3 class="block-title">EDUCATION &amp; HIGHLIGHTS</h3>
+
+            <div class="sub-block-label">EDUCATION</div>
+            <div class="edu-item-box">
+              <div class="edu-item-info">
+                <h4>Bachelor of Computer Application</h4>
+                <p>Amity University &bull; Specialization: Data Analysis</p>
+                <p style="color: var(--crimson-bright); font-size: 0.78rem; font-weight: 700; margin-top: 2px;">CGPA:
+                  7.35</p>
+              </div>
+              <span class="edu-year-tag">2023 &mdash; 2026</span>
+            </div>
+
+            <div class="edu-item-box">
+              <div class="edu-item-info">
+                <h4>AI &amp; Data Science Projects</h4>
+                <p>Self-Driven &bull; Applied Machine Learning</p>
+              </div>
+              <span class="edu-year-tag">2024 &mdash; Present</span>
+            </div>
+
+            <div class="sub-block-label" style="margin-top: 16px;">LOCATION &amp; STATUS</div>
+            <div class="skills-badge-wrap">
+              <span class="skill-pill-badge">DELHI, INDIA</span>
+              <span class="skill-pill-badge">OPEN TO INTERNSHIPS</span>
+              <span class="skill-pill-badge">FULL-TIME ROLES</span>
+              <span class="skill-pill-badge">REMOTE / HYBRID</span>
+            </div>
+          </div>
+
+          <!-- Block 2: Work Process -->
+          <div class="block-card spotlight-card">
+            <h3 class="block-title">WORK PROCESS</h3>
+
+            <div class="process-timeline">
+              <!-- Step 01 -->
+              <div class="process-step-row">
+                <div class="process-step-num">01</div>
+                <div class="process-step-icon">&#128269;</div>
+                <div class="process-step-text">
+                  <h4>DISCOVER</h4>
+                  <p>Understanding business goals, schema structure, and requirements.</p>
+                </div>
+              </div>
+
+              <!-- Step 02 -->
+              <div class="process-step-row">
+                <div class="process-step-num">02</div>
+                <div class="process-step-icon">&#128161;</div>
+                <div class="process-step-text">
+                  <h4>ANALYZE</h4>
+                  <p>Data cleaning, exploratory data analysis (EDA), and anomaly resolution.</p>
+                </div>
+              </div>
+
+              <!-- Step 03 -->
+              <div class="process-step-row">
+                <div class="process-step-num">03</div>
+                <div class="process-step-icon">&#9881;</div>
+                <div class="process-step-text">
+                  <h4>MODEL &amp; QUERY</h4>
+                  <p>Crafting optimized SQL queries, CTEs, and ML/NLP pipelines.</p>
+                </div>
+              </div>
+
+              <!-- Step 04 -->
+              <div class="process-step-row">
+                <div class="process-step-num">04</div>
+                <div class="process-step-icon">&lt;/&gt;</div>
+                <div class="process-step-text">
+                  <h4>VISUALIZE &amp; BUILD</h4>
+                  <p>Building interactive Power BI dashboards &amp; Streamlit AI apps.</p>
+                </div>
+              </div>
+
+              <!-- Step 05 -->
+              <div class="process-step-row">
+                <div class="process-step-num">05</div>
+                <div class="process-step-icon">&#128640;</div>
+                <div class="process-step-text">
+                  <h4>DELIVER</h4>
+                  <p>Testing, query performance tuning, and delivering results.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Block 3: Crimson Quote Card -->
+          <div class="quote-block-card spotlight-card">
+            <div>
+              <div class="giant-quote-mark">&ldquo;</div>
+              <div class="quote-statement">
+                Without data, you're just another person with an opinion. Transforming raw complexity into
+                high-conviction decisions is what I do.
+              </div>
+            </div>
+
+            <div>
+              <div class="quote-signature">Shubham Keshri</div>
+              <div class="quote-bottom-tag">
+                LET'S CREATE SOMETHING GREAT TOGETHER. &#10022;
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Interactive Terminal CLI Console -->
+    <section id="terminal" class="section-wrapper">
+      <div class="container">
+        <div class="section-head-bar">
+          <h2 class="section-main-heading">DEVELOPER CONSOLE</h2>
+          <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--crimson-bright);">TYPE 'HELP' FOR
+            COMMANDS</span>
+        </div>
+
+        <div class="terminal-window spotlight-card">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <span class="terminal-dot dot-red"></span>
+              <span class="terminal-dot dot-yellow"></span>
+              <span class="terminal-dot dot-green"></span>
+            </div>
+            <div class="terminal-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="4 17 10 11 4 5" />
+                <line x1="12" y1="19" x2="20" y2="19" />
+              </svg>
+              <span>shubham@core — zsh</span>
+            </div>
+            <div class="terminal-status">LIVE</div>
+          </div>
+
+          <div class="terminal-body" id="terminal-container">
+            <div id="term-output"></div>
+            <div class="terminal-input-row">
+              <span class="term-prompt">shubham@core:~$</span>
+              <input type="text" id="term-input" class="terminal-input" autocomplete="off" spellcheck="false"
+                placeholder="Type a command (e.g. 'help', 'rank-resume', 'skills')..." aria-label="Terminal input">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Contact Section: LET'S WORK TOGETHER (Matching Reference) -->
+    <section id="contact" class="section-wrapper" style="padding-bottom: 100px;">
+      <div class="container">
+        <div class="contact-grid-layout">
+          <!-- Left Column -->
+          <div class="contact-left-col">
+            <h2>LET'S WORK<br><span>TOGETHER &#10022;</span></h2>
+            <p>
+              I am currently open for full-time Data Analyst, Business Intelligence, and AI Developer opportunities
+              &amp; internships. Let's create impactful data solutions together.
+            </p>
+            <a href="mailto:shubhamkeshri.433@gmail.com" class="btn-crimson" id="main-contact-cta">
+              <span>AVAILABLE FOR HIRE</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+
+          <!-- Right Column -->
+          <div class="contact-right-col">
+            <!-- Email -->
+            <a href="javascript:void(0)" class="contact-info-card spotlight-card" id="copy-email-btn"
+              title="Click to copy email address">
+              <div class="contact-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+              </div>
+              <div>
+                <div class="contact-card-label">Email (Click to Copy)</div>
+                <div class="contact-card-value" id="contact-email">shubhamkeshri.433@gmail.com</div>
+              </div>
+            </a>
+
+            <!-- GitHub -->
+            <a href="https://github.com/Shubhamkeshri433" target="_blank" rel="noopener noreferrer"
+              class="contact-info-card spotlight-card">
+              <div class="contact-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+                </svg>
+              </div>
+              <div>
+                <div class="contact-card-label">GitHub Profile</div>
+                <div class="contact-card-value">github.com/Shubhamkeshri433</div>
+              </div>
+            </a>
+
+            <!-- LinkedIn -->
+            <a href="https://www.linkedin.com/in/shubhamkeshri433/" target="_blank" rel="noopener noreferrer"
+              class="contact-info-card spotlight-card">
+              <div class="contact-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                </svg>
+              </div>
+              <div>
+                <div class="contact-card-label">LinkedIn</div>
+                <div class="contact-card-value">linkedin.com/in/shubhamkeshri433</div>
+              </div>
+            </a>
+
+            <!-- Location -->
+            <div class="contact-info-card spotlight-card" style="cursor: default;">
+              <div class="contact-icon-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+              </div>
+              <div>
+                <div class="contact-card-label">Location</div>
+                <div class="contact-card-value">Delhi, India</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <p>&copy; 2026 Designed &amp; Engineered for <strong style="color: #ffffff;">Shubham Keshri</strong>. Powered by
+          Live GitHub API &amp; Three.js WebGL.</p>
+      </div>
     </footer>
 
-    <script src="script.js"></script>
+  </div>
+
+  <!-- One-Click Toast Notification -->
+  <div class="copy-toast" id="copy-toast">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+    <span>Email copied to clipboard!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/projects-data.js"></script>
+  <script src="js/github-sync.js"></script>
+  <script src="js/terminal.js"></script>
+  <script src="js/scene3d.js"></script>
+  <script src="js/main.js"></script>
 </body>
+
 </html>
