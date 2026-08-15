@@ -1,0 +1,272 @@
+/* ==========================================================================
+   Terminal CLI Stylesheet - Apple Pro Minimal Design
+   ========================================================================== */
+
+.terminal-window {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--bg-card, rgba(14, 16, 24, 0.70));
+  backdrop-filter: blur(var(--glass-blur, 16px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 16px));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7),
+              0 0 0 1px rgba(255, 255, 255, 0.05),
+              0 0 40px rgba(0, 240, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.terminal-window:hover {
+  border-color: rgba(0, 240, 255, 0.25);
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8),
+              0 0 0 1px rgba(0, 240, 255, 0.15),
+              0 0 50px rgba(0, 240, 255, 0.1);
+}
+
+.terminal-header {
+  height: 42px;
+  background: rgba(18, 22, 30, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  user-select: none;
+}
+
+.terminal-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.terminal-dot.dot-red {
+  background: #ff5f56;
+  border: 1px solid #e0443e;
+}
+
+.terminal-dot.dot-yellow {
+  background: #ffbd2e;
+  border: 1px solid #dea123;
+}
+
+.terminal-dot.dot-green {
+  background: #27c93f;
+  border: 1px solid #1aab29;
+}
+
+.terminal-window:hover .terminal-dot {
+  transform: scale(1.05);
+}
+
+.terminal-title {
+  font-family: 'SF Mono', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  font-size: 0.82rem;
+  color: var(--text-muted, #94a3b8);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.5px;
+}
+
+.terminal-status {
+  font-family: 'SF Mono', 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.terminal-body {
+  height: 380px;
+  padding: 20px;
+  overflow-y: auto;
+  font-family: 'SF Mono', 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.terminal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.terminal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.terminal-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.term-prompt {
+  color: #00f0ff;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.terminal-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: #ffffff;
+  padding: 0;
+}
+
+/* Terminal Text Elements */
+.term-line {
+  word-break: break-word;
+}
+
+.term-accent {
+  color: #00f0ff;
+}
+
+.term-dim {
+  color: #64748b;
+}
+
+.term-hl {
+  color: #f1f5f9;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.term-green {
+  color: #10b981;
+}
+
+.term-cyan {
+  color: #38bdf8;
+}
+
+.term-error {
+  color: #f87171;
+  font-weight: 500;
+}
+
+.term-badge {
+  font-size: 0.75rem;
+  background: rgba(139, 92, 246, 0.15);
+  color: #c084fc;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.term-link {
+  color: #00f0ff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity 0.2s;
+}
+
+.term-link:hover {
+  opacity: 0.8;
+}
+
+.term-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 8px 0;
+}
+
+.term-spacer {
+  height: 8px;
+}
+
+.term-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 6px 0;
+}
+
+.term-highlight-box {
+  background: rgba(0, 240, 255, 0.04);
+  border-color: rgba(0, 240, 255, 0.2);
+}
+
+.term-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.term-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+  font-size: 0.88rem;
+}
+
+.term-col-cmd {
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.term-sql-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0;
+  font-size: 0.82rem;
+}
+
+.term-sql-table th,
+.term-sql-table td {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.term-sql-table th {
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.term-sql-table td {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .terminal-body {
+    height: 320px;
+    font-size: 0.82rem;
+    padding: 14px;
+  }
+  .term-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+    margin-bottom: 6px;
+  }
+}
