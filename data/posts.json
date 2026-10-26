@@ -1,10 +1,25 @@
 [
   {
+    "slug": "why-i-started-with-messy-data",
+    "title": "Why I started with messy data",
+    "date": "2026-10-26",
+    "summary": "How a pile of confusing numbers made me fall in love with data, and what I’m building because of it.",
+    "tags": [
+      "story",
+      "data",
+      "learning"
+    ],
+    "draft": false,
+    "body": "I did not start with a big plan. I started with a question: how does a pile of numbers turn into a clear answer?\n\nWhen I joined my BCA at Amity University in Delhi, I picked **Data Analysis** as my intrest mostly out of curiosity. [One line about what pushed you towards it, a class, a video, a moment.]\n\n## The first thing I learned\n\nReal data is messy. Missing values, wrong dates, and the same customer written three different ways. My first big lesson was that the analysis is the easy part. Most of the work is cleaning.\n\nThat is why one of my favourite projects is [Dirty Cafe Data Cleaning](https://github.com/Shubhamkeshri433/Dirty-Cafe-Data-Set). It takes messy cafe sales logs and turns them into tables you can actually use.\n\n## Learning the tools\n\nI started with SQL: T-SQL, CTEs, and window functions. Then Python, Pandas, Numpy and Matplotlib then Excel and Power BI. I did not learn them from a list. I learned them by building things and getting stuck and fixing it.\n\nSome things that helped me:\n\n- Pick a small real problem, not a perfect one.\n- Write down what broke and why.\n- Build it again, a little cleaner.\n\n## What I'm building now\n\nPipelines, dashboards, and a few AI projects, like an [AI Resume Ranker](https://github.com/Shubhamkeshri433/AI-Resume-Ranker) that compares resumes to a job description using NLP. [One honest sentence about what was hard or surprising.]\n\n## What's next\n\nI want to work on the systems that let a team ask a question and trust the answer. Cleaner data, clearer dashboards, and AI that does real work.\n\nThis blog is where I'll share what I learn along the way, including the mistakes. If you work with data too, or want to talk, my email is on the Connect page.\n\n> peace"
+  },
+  {
     "slug": "welcome-to-the-blog",
     "title": "Welcome to the blog",
-    "date": "2026-10-25",
-    "summary": "What this space is for, and what to expect here.",
-    "tags": ["notes"],
+    "date": "2026-10-26",
+    "summary": "Hi , Everyone ",
+    "tags": [
+      "notes"
+    ],
     "draft": false,
     "body": "This is a starter post. Replace it with your own writing.\n\n## What goes here\n\n- Short write-ups of data projects: the question, the method, the result.\n- Notes on SQL, Python and Power BI that I wish I had found sooner.\n- Experiments with AI tools and what actually worked.\n\n## How posts are written\n\nPosts use simple **Markdown**: headings, lists, `inline code`, links like [GitHub](https://github.com/Shubhamkeshri433), and code blocks.\n\n```sql\nSELECT department, AVG(salary) AS avg_salary\nFROM employees\nGROUP BY department;\n```\n\n> Without data, you're just another person with an opinion."
   }
