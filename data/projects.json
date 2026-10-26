@@ -28,6 +28,19 @@
     "featured": true
   },
   {
+    "id": "maven-fuzzy-factory",
+    "title": "Maven Fuzzy Factory Analysis",
+    "badge": "E-Commerce Analytics",
+    "desc": "Website traffic, channel conversion funnels and revenue optimisation for an online store.",
+    "tech": [
+      "SQL",
+      "Funnels",
+      "KPI Metrics"
+    ],
+    "url": "https://github.com/Shubhamkeshri433/Maven-Fuzzy-Factory-data-analysis-project",
+    "featured": true
+  },
+  {
     "id": "dirty-cafe-data",
     "title": "Dirty Cafe Data Cleaning",
     "badge": "ETL & Cleansing",
@@ -39,19 +52,6 @@
       "Data Cleaning"
     ],
     "url": "https://github.com/Shubhamkeshri433/Dirty-Cafe-Data-Set",
-    "featured": true
-  },
-  {
-    "id": "maven-fuzzy-factory",
-    "title": "Maven Fuzzy Factory Analysis",
-    "badge": "E-Commerce Analytics",
-    "desc": "Website traffic, channel conversion funnels and revenue optimisation for an online store.",
-    "tech": [
-      "SQL",
-      "Funnels",
-      "KPI Metrics"
-    ],
-    "url": "https://github.com/Shubhamkeshri433/Maven-Fuzzy-Factory-data-analysis-project",
     "featured": true
   },
   {
