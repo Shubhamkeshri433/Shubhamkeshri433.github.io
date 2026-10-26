@@ -1,169 +1,182 @@
 /**
- * Main Application Logic & Interactivity
- * Shubham Keshri Portfolio - Crimson Obsidian Theme
+ * Entry point. Starts the 3D film if the browser can run it; otherwise the page
+ * simply stays as the readable static layout (no JS needed for any content).
  */
-
-document.addEventListener('DOMContentLoaded', () => {
-  renderStats();
-  initGitHubSync();
-  initScrollSpy();
-  initCopyEmail();
-  initCard3DTilt();
-  initMouseSpotlight();
-  initTerminal();
-});
-
-/* --------------------------------------------------------------------------
-   1. Render Quantitative Stats
-   -------------------------------------------------------------------------- */
-function renderStats() {
-  const container = document.getElementById('hero-metrics-container');
-  if (!container || !PORTFOLIO_DATA.stats) return;
-
-  container.innerHTML = PORTFOLIO_DATA.stats.map(stat => `
-    <div class="metric-card">
-      <div class="metric-val">${stat.value}</div>
-      <div class="metric-label">${stat.label}</div>
-    </div>
-  `).join('');
-}
-
-/* --------------------------------------------------------------------------
-   2. Initialize Live GitHub Repo Syncing
-   -------------------------------------------------------------------------- */
-function initGitHubSync() {
-  if (typeof GitHubRepoSync !== 'undefined') {
-    window.gitHubSync = new GitHubRepoSync('Shubhamkeshri433', 'projects-grid-container');
-    window.gitHubSync.init();
-  }
-}
-
-/* --------------------------------------------------------------------------
-   3. Scroll Spy for Active Navbar Link
-   -------------------------------------------------------------------------- */
-function initScrollSpy() {
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav-menu-link');
-
-  window.addEventListener('scroll', () => {
-    let current = '';
-    const scrollPos = window.scrollY + 200;
-
-    sections.forEach(section => {
-      const top = section.offsetTop;
-      const height = section.offsetHeight;
-      if (scrollPos >= top && scrollPos < top + height) {
-        current = section.getAttribute('id');
-      }
-    });
-
-    navLinks.forEach(link => {
-      link.classList.remove('active');
-      if (link.getAttribute('href') === `#${current}`) {
-        link.classList.add('active');
-      }
-    });
+const params = location.search;
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (!reduce && !/[?&]static\b/.test(params)) {
+  start().catch((err) => {
+    console.warn('Cinematic mode unavailable, showing static page.', err);
+    document.documentElement.classList.remove('cine');
   });
 }
 
-/* --------------------------------------------------------------------------
-   4. One-Click Copy Email
-   -------------------------------------------------------------------------- */
-function initCopyEmail() {
-  const copyBtn = document.getElementById('copy-email-btn');
-  const emailText = document.getElementById('contact-email');
-  const toast = document.getElementById('copy-toast');
+async function start() {
+  const THREE = await import('./vendor/three.bundle.js');
+  const { createWorld } = await import('./world.js');
+  const { createDirector } = await import('./director.js');
+  const { createUI } = await import('./ui.js');
+  const { GradeShader } = await import('./shaders.js');
+  const { pToU, setFrameCount } = await import('./path.js');
+  const { hydrate } = await import('./hydrate.js');
+  await hydrate().catch(() => {});
+  const { smooth, clamp, lerp } = await import('./util.js');
 
-  if (!copyBtn || !emailText) return;
+  const canvas = document.getElementById('gl');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance', alpha: false });
+  if (!renderer.capabilities.isWebGL2 && renderer.capabilities.maxTextures < 8) throw new Error('weak GPU');
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
 
-  copyBtn.addEventListener('click', async (e) => {
-    e.preventDefault();
-    const email = 'shubhamkeshri.433@gmail.com';
-    try {
-      await navigator.clipboard.writeText(email);
-      showToast();
-    } catch (err) {
-      const input = document.createElement('input');
-      input.value = email;
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand('copy');
-      document.body.removeChild(input);
-      showToast();
-    }
-  });
+  const small = Math.min(innerWidth, innerHeight) < 700;
+  const weak = (navigator.hardwareConcurrency || 4) <= 4 || small;
+  const quality = { low: weak, puffs: weak ? 110 : 190, octaves: weak ? 3 : 5 };
+  let maxDpr = Math.min(devicePixelRatio || 1, weak ? 1.25 : 1.75);
+  let dpr = maxDpr;
 
-  function showToast() {
-    if (!toast) return;
-    toast.classList.add('show');
-    setTimeout(() => {
-      toast.classList.remove('show');
-    }, 2800);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(52, innerWidth / innerHeight, 0.1, 400);
+  camera.position.set(0, 0.3, 12);
+
+  const projects = [...document.querySelectorAll('.work-list li')].map((li) => ({
+    title: li.querySelector('strong').textContent.trim(),
+    desc: li.querySelector('span').textContent.trim(),
+    badge: li.dataset.badge,
+    tech: li.dataset.tech.split(','),
+    url: li.querySelector('a').href,
+  }));
+
+  setFrameCount(projects.length);
+  const world = createWorld({ scene, camera, renderer, quality, projects });
+  const director = createDirector({ camera });
+  const ui = createUI();
+
+  const composer = new THREE.EffectComposer(renderer);
+  composer.addPass(new THREE.RenderPass(scene, camera));
+  const bloom = new THREE.UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.45, 0.55, 0.9);
+  composer.addPass(bloom);
+  composer.addPass(new THREE.OutputPass());
+  const gradePass = new THREE.ShaderPass(GradeShader);
+  composer.addPass(gradePass);
+  const GU = gradePass.uniforms;
+
+  function resize() {
+    const w = innerWidth, h = innerHeight;
+    renderer.setPixelRatio(dpr);
+    renderer.setSize(w, h, false);
+    composer.setPixelRatio(dpr);
+    composer.setSize(w, h);
+    bloom.resolution.set(w / 2, h / 2);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    world.resize(camera.aspect, dpr);
+    GU.uRes.value = [w * dpr, h * dpr];
   }
-}
+  resize();
+  addEventListener('resize', resize);
 
-/* --------------------------------------------------------------------------
-   5. Interactive Mouse Light Spotlight Effect on Section Blocks
-   -------------------------------------------------------------------------- */
-function initMouseSpotlight() {
-  const selector = '.spotlight-card, .project-card, .block-card, .skills-table-container, .contact-info-card, .quote-block-card, .terminal-window, .skill-table-pill';
-  
-  const updateSpotlight = (card, e) => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    card.style.setProperty('--mouse-x', `${x}px`);
-    card.style.setProperty('--mouse-y', `${y}px`);
+  /* pointer */
+  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  addEventListener('pointermove', (e) => {
+    pointer.tx = (e.clientX / innerWidth) * 2 - 1;
+    pointer.ty = -((e.clientY / innerHeight) * 2 - 1);
+  }, { passive: true });
+
+  /* scroll */
+  let target = 0;
+  const readScroll = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    target = max > 0 ? clamp(scrollY / max) : 0;
   };
-
-  document.addEventListener('mousemove', (e) => {
-    const cards = document.querySelectorAll(selector);
-    cards.forEach(card => {
-      const rect = card.getBoundingClientRect();
-      // Check if mouse is nearby/over card
-      if (
-        e.clientX >= rect.left - 50 &&
-        e.clientX <= rect.right + 50 &&
-        e.clientY >= rect.top - 50 &&
-        e.clientY <= rect.bottom + 50
-      ) {
-        updateSpotlight(card, e);
-      }
-    });
+  readScroll();
+  addEventListener('scroll', readScroll, { passive: true });
+  addEventListener('resize', readScroll);
+  ui.bind((p) => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    window.scrollTo({ top: p * max, behavior: 'smooth' });
   });
-}
 
-/* --------------------------------------------------------------------------
-   6. 3D Tilt Physics for Cards
-   -------------------------------------------------------------------------- */
-function initCard3DTilt() {
-  const cards = document.querySelectorAll('.tilt-card');
-  cards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-
-      const rotateX = ((y - centerY) / centerY) * -4;
-      const rotateY = ((x - centerX) / centerX) * 4;
-
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-3px)`;
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
-    });
+  canvas.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault();
+    document.documentElement.classList.remove('cine');
   });
-}
 
-/* --------------------------------------------------------------------------
-   7. Terminal CLI Initialization
-   -------------------------------------------------------------------------- */
-function initTerminal() {
-  if (typeof TerminalCLI !== 'undefined') {
-    window.terminalInstance = new TerminalCLI('terminal-container', 'term-input', 'term-output');
+  /* fonts for the 3D frames, then go */
+  await Promise.race([
+    document.fonts ? Promise.all([document.fonts.load('40px Bangers'), document.fonts.load('20px "DM Sans"'), document.fonts.load('18px "JetBrains Mono"')]) : null,
+    new Promise((r) => setTimeout(r, 1800)),
+  ]).catch(() => {});
+  world.drawTextures();
+
+  document.documentElement.classList.add('cine');
+  window.__cineReady = true;
+  readScroll();
+  resize();
+
+  const state = {
+    p: target, u: 0, t: 0, dt: 0.016, flow: 0, pointer,
+    grade: director.grade, intro: { t: 0, cover: 1 },
+  };
+  const FAST = /[?&]fast\b/.test(params); // test flag: skip intro, snap scroll
+  if (FAST) state.intro.t = 6;
+  let last = performance.now(), frames = 0, acc = 0, started = false;
+  const cover = document.querySelector('.intro-cover');
+
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const dt = Math.min((now - last) / 1000, FAST ? 0.5 : 0.1);
+    last = now;
+    state.dt = dt;
+    state.t += dt;
+
+    pointer.x = lerp(pointer.x, pointer.tx, 1 - Math.exp(-dt * 6));
+    pointer.y = lerp(pointer.y, pointer.ty, 1 - Math.exp(-dt * 6));
+
+    const prev = state.p;
+    state.p += (target - state.p) * (FAST ? 1 : 1 - Math.exp(-dt * 4.5));
+    if (Math.abs(target - state.p) < 0.00005) state.p = target;
+    state.u = pToU(state.p);
+
+    const speed = clamp(Math.abs(state.p - prev) / Math.max(dt, 1e-3) * 0.9);
+    state.flow += dt * (0.1 + speed * 0.9);
+
+    if (started) state.intro.t += dt;
+    state.intro.cover = 1 - smooth(0.45, 2.7, state.intro.t);
+
+    const fast = director.update(state.p, state.u, pointer, state.t, dt);
+    world.update(state);
+
+    const g = director.grade;
+    GU.uTime.value = state.t;
+    GU.uGrain.value = g.grain;
+    GU.uVignette.value = g.vig;
+    GU.uChroma.value = g.chroma;
+    GU.uSat.value = 0;
+    GU.uContrast.value = g.con;
+    GU.uShadowTint.value = g.shadow;
+    GU.uHighTint.value = g.high;
+    GU.uFade.value = 0.9;
+    GU.uSpeed.value = clamp(fast * 1.2 - 0.25) * (1 - state.intro.cover);
+
+    ui.update(state.p);
+
+    composer.render(dt);
+
+    if (!started && ++frames === 3) {
+      started = true;
+      cover.classList.add('gone');
+      document.documentElement.classList.add('ready');
+    }
+
+    // adaptive resolution
+    acc += dt;
+    if (frames > 40 && acc > 1.5) {
+      const fps = 1 / dt;
+      if (dt > 0.034 && dpr > 0.65) { dpr = Math.max(0.65, dpr - 0.15); resize(); }
+      else if (dt < 0.019 && dpr < maxDpr) { dpr = Math.min(maxDpr, dpr + 0.1); resize(); }
+      acc = 0;
+    }
   }
+  requestAnimationFrame(frame);
+  window.__cine = { state, world, renderer, camera };
 }

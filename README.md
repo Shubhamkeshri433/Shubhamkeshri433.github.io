@@ -1,59 +1,27 @@
-# Shubham Keshri — Personal Portfolio
+# Shubham Keshri — portfolio
 
-My personal developer portfolio website, built to showcase my **projects, skills, experience, and technical journey** through a modern and interactive web experience.
+A scroll-driven, manga-style film of my journey (past, present, future), built with plain HTML, CSS and JavaScript plus a self-hosted Three.js bundle. Deployed on GitHub Pages.
 
-## 🌐 About
+## Design
+Black-and-white manga page: angled panels, speed-line bursts, speech bubbles, halftone texture and a single red accent. The 3D sky, clouds and instrument are rendered in black and white with ink outlines, halftone dots and cel-shaded bands (see `GradeShader` in `js/shaders.js`).
 
-The portfolio combines a clean interface with **3D visuals, animations, interactive sections, and dynamic GitHub data**.
+## Structure
+- `index.html` the scroll film. Its text is the fallback; `js/hydrate.js` fills name, role, contact links, toolbox and projects from `data/*.json` before the 3D scene starts.
+- `skills.html`, `projects.html`, `blog.html`, `connect.html` content pages rendered by `js/pages.js` from the JSON files (DOM nodes only, no innerHTML). `js/md.js` is a safe Markdown renderer for blog posts; `js/dom.js` has small helpers.
+- `data/site.json`, `skills.json`, `projects.json`, `posts.json` all editable content. Set `"draft": true` on a post to hide it.
+- `css/manga.css` all styling, including the 404 and privacy pages.
+- `js/main.js` entry, renderer and scroll smoothing. `js/world.js` the 3D scene. `js/director.js` camera path and per-chapter grading. `js/ui.js` fades story panels and drives the project card. `js/path.js` flight path and timing tables. `js/shaders.js` sky, clouds and the manga post-process.
+- `js/vendor/three.bundle.js` Three.js r186, bundled by `tools/build.sh`.
+- `404.html`, `privacy.html` standalone pages.
 
-It includes:
+- `admin/index.html`, `css/admin.css`, `js/admin.js`, `js/config.js` owner-only dashboard that edits `data/*.json` through the GitHub API. Setup and security notes: `ADMIN.md`.
 
-* 👨‍💻 About Me
-* 🛠️ Skills & Technologies
-* 🚀 Projects
-* 📊 GitHub Activity
-* 🎯 Goals & Learning
-* 📬 Contact & Social Links
+## Behaviour
+- Without WebGL, with reduced motion, or with `?static`, the page shows a readable static layout with every project and link.
+- `?fast` is a testing flag that skips the intro and snaps the scroll.
 
-## 🧰 Technologies
+## Run locally
+ES modules need a server: `python3 -m http.server`, then open http://localhost:8000.
 
-<p align="left">
-
-<img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white"/>
-<br>
-<img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white"/>
-<br>
-<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"/>
-<br>
-<img src="https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=three.js&logoColor=white"/>
-<br>
-<img src="https://img.shields.io/badge/WebGL-990000?style=for-the-badge&logo=webgl&logoColor=white"/>
-<br>
-<img src="https://img.shields.io/badge/GitHub_API-181717?style=for-the-badge&logo=github&logoColor=white"/>
-<br>
-
-</p>
-
-## 🎨 Design & Experience
-
-The website focuses on a **minimal, modern, and interactive design**, using 3D elements and motion to make the portfolio itself part of the showcase.
-
-The goal is to create an experience that reflects my interest in **web development, data, AI, and emerging technologies**.
-
-## 🚀 Live Website
-
-**Portfolio:**
-https://shubhamkeshri433.github.io/
-
-## 📂 Repository
-
-This repository contains the source code, styles, scripts, and assets used to build and deploy the portfolio with **GitHub Pages**.
-
-The website will continue to evolve as I build new projects, learn new technologies, and improve the experience.
-
----
-
-<p align="center">
-  <b>© 2026 Shubham Keshri</b><br>
-  Designed & Engineered with Three.js, WebGL & GitHub API.
-</p>
+## Rebuild the Three.js bundle
+`THREE_SRC=/path/to/three.js ESBUILD=esbuild tools/build.sh`
