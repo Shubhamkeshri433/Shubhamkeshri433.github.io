@@ -293,3 +293,14 @@ main { position: relative; z-index: 10; }
 .page > .doc-hero { margin-bottom: 28px; }
 .sec ul.chips { padding-left: 0; }
 .sec ul.chips li { margin: 0; }
+
+/* Light page (phones, reduced motion, ?static): the menu is a solid bar that stays on top instead of floating over the text */
+html:not(.cine) .hud {
+  position: sticky; top: 0; left: auto; right: auto; z-index: 60;
+  padding: 10px 14px; background: var(--paper); border-bottom: 4px solid var(--ink);
+}
+html:not(.cine) .hud .brand { font-size: 22px; }
+html:not(.cine) main { padding-top: 18px; }
+
+/* No flash of old text: hide the page until data/content.json has been applied (JS adds .hy, and removes it right after) */
+html.hy .hud, html.hy main, html.hy .doc-hero, html.hy .pg-head, html.hy .page-foot { visibility: hidden; }

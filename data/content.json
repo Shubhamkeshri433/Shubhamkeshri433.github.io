@@ -13,12 +13,12 @@
       "hint": "Scroll to begin"
     },
     "past": {
-      "cap": "Chapter 1 · The past · 2024",
+      "cap": "Chapter 1 · The past · 2023",
       "title": "It began with a question",
-      "body": "I joined Amity University Noida for a Bachelor of Computer Application and chose **Data Science & Analysis** as my interest. I wanted to know how a pile of numbers becomes a clear answer."
+      "body": "I joined Amity University, Delhi for a Bachelor of Computer Application and chose **Data Analysis** as my specialization. I wanted to know how a pile of numbers becomes a clear answer."
     },
     "learn": {
-      "cap": "Chapter 2 · Learning the tools · 2025",
+      "cap": "Chapter 2 · Learning the tools · 2024",
       "title": "Then the tools",
       "body": "SQL first: T-SQL, CTEs, window functions. Then Python and Pandas, Excel and Power BI. Self-driven projects followed, and each one taught me something the classroom did not.",
       "chips": [
@@ -40,7 +40,7 @@
     "future": {
       "cap": "Chapter 4 · The future · next",
       "title": "Where I’m headed",
-      "body": "Data Scientist & Analyst, BI and AI Developer roles, and internships. I want to build the systems that let a team ask a question and trust the answer: cleaner pipelines, sharper dashboards, and AI models that do real work."
+      "body": "Data Analyst, BI and AI Developer roles, and internships. I want to build the systems that let a team ask a question and trust the answer: cleaner pipelines, sharper dashboards, and AI agents that do real work."
     },
     "quote": "“Without data, you’re just another person with an opinion.”",
     "contact": {

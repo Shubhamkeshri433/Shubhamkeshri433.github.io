@@ -31,6 +31,7 @@
     /* Decide up front, before first paint, so a visitor sees the title card and never a flash of the plain page. */
     (function () {
       var d = document.documentElement;
+      d.classList.add('hy'); setTimeout(function () { d.classList.remove('hy'); }, 3000); // hidden until the latest text is applied, then shown
       /* Phones get the light page (no 3D): smooth scrolling and no battery drain. Add ?3d to the address to force the animation. */
       var phone = window.matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 700 && !/[?&]3d\b/.test(location.search);
       var ok = !phone && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && !/[?&]static\b/.test(location.search);

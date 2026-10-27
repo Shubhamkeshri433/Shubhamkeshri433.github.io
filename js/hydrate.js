@@ -15,6 +15,10 @@ async function load(name) {
 const $ = (s) => document.querySelector(s);
 
 export async function hydrate() {
+  try { await run(); } finally { document.documentElement.classList.remove('hy'); }
+}
+
+async function run() {
   const [site, skills, projects, content] = await Promise.all([load('site').catch(() => null), load('skills').catch(() => null), load('projects').catch(() => null), loadContent()]);
   applyShell(content);
   applyHome(content);

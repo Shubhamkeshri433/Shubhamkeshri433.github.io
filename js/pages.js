@@ -76,5 +76,6 @@ const page = document.body.dataset.page;
   const c = await loadContent();
   window.__content = c;
   applyShell(c); applyPage(c, page);
+  document.documentElement.classList.remove('hy');
   if (root && pages[page]) await pages[page](root);
-})().catch(() => fail(root, 'Could not load this page. Please try again in a moment.'));
+})().catch(() => { document.documentElement.classList.remove('hy'); fail(root, 'Could not load this page. Please try again in a moment.'); });

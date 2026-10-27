@@ -1,50 +1,8 @@
 [
-  {
-    "category": "Programming",
-    "items": [
-      "Python",
-      "HTML",
-      "CSS",
-      "Oops",
-      "Clean Architecture"
-    ]
-  },
-  {
-    "category": "SQL & Databases",
-    "items": [
-      "MSSQL",
-      "T-SQL",
-      "MySQL",
-      "CTEs",
-      "Window Functions",
-      "Stored Procedures"
-    ]
-  },
-  {
-    "category": "Data Analytics & BI",
-    "items": [
-      "Power BI",
-      "Excel",
-      "Pandas",
-      "NumPy",
-      "Matplotlib DAX",
-      "KPI Dashboards"
-    ]
-  },
-  {
-    "category": "Tools & Deployment",
-    "items": [
-      "Git",
-      "GitHub",
-      "VS Code",
-      "Jupyter Notebook"
-    ]
-  },
-  {
-    "category": "AI Tools",
-    "items": [
-      "Claude - Opus | Fable",
-      "ChatGPT - GPT-6 Astra | GPT-5.6 Sol / Luna"
-    ]
-  }
+  { "category": "Programming", "items": ["Python", "JavaScript", "HTML5", "CSS3", "OOP", "Clean Architecture"] },
+  { "category": "SQL & Databases", "items": ["MSSQL", "T-SQL", "MySQL", "CTEs", "Window Functions", "Stored Procedures"] },
+  { "category": "Data Analytics & BI", "items": ["Power BI", "Excel", "Pandas", "NumPy", "DAX", "KPI Dashboards"] },
+  { "category": "AI & Machine Learning", "items": ["Machine Learning", "NLP & Semantic Search", "Vector Embeddings", "Cosine Scoring"] },
+  { "category": "AI Development", "items": ["LangChain", "Streamlit", "PyTorch / TensorFlow", "AI Agents"] },
+  { "category": "Tools & Deployment", "items": ["Git", "GitHub", "VS Code", "Jupyter Notebook"] }
 ]
