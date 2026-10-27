@@ -3,10 +3,9 @@
     "category": "Programming",
     "items": [
       "Python",
-      "JavaScript",
-      "HTML5",
-      "CSS3",
-      "OOP",
+      "HTML",
+      "CSS",
+      "Oops",
       "Clean Architecture"
     ]
   },
@@ -28,7 +27,7 @@
       "Excel",
       "Pandas",
       "NumPy",
-      "DAX",
+      "Matplotlib DAX",
       "KPI Dashboards"
     ]
   },
@@ -39,6 +38,13 @@
       "GitHub",
       "VS Code",
       "Jupyter Notebook"
+    ]
+  },
+  {
+    "category": "AI Tools",
+    "items": [
+      "Claude - Opus | Fable",
+      "ChatGPT - GPT-6 Astra | GPT-5.6 Sol / Luna"
     ]
   }
 ]
