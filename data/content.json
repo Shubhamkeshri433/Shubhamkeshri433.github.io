@@ -13,12 +13,12 @@
       "hint": "Scroll to begin"
     },
     "past": {
-      "cap": "Chapter 1 · The past · 2023",
+      "cap": "Chapter 1 · The past · 2024",
       "title": "It began with a question",
-      "body": "I joined Amity University, Delhi for a Bachelor of Computer Application and chose **Data Analysis** as my specialization. I wanted to know how a pile of numbers becomes a clear answer."
+      "body": "I joined Amity University, Noida for a Bachelor of Computer Application and chose **Data Science & Analysis** as my intrest. I wanted to know how a pile of numbers becomes a clear answer."
     },
     "learn": {
-      "cap": "Chapter 2 · Learning the tools · 2024",
+      "cap": "Chapter 2 · Learning the tools · 2025",
       "title": "Then the tools",
       "body": "SQL first: T-SQL, CTEs, window functions. Then Python and Pandas, Excel and Power BI. Self-driven projects followed, and each one taught me something the classroom did not.",
       "chips": [
