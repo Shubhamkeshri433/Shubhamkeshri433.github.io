@@ -1,8 +1,85 @@
 [
-  { "id": "ai-resume-ranker", "title": "AI Resume Ranker", "badge": "AI & NLP System", "desc": "AI-powered candidate screening that ranks resumes against a job description using NLP and semantic vector similarity.", "tech": ["Python", "Streamlit", "NLP", "Semantic Search"], "url": "https://github.com/Shubhamkeshri433/AI-Resume-Ranker", "featured": true },
-  { "id": "customer-shopping-behavior", "title": "Customer Shopping Behavior Analysis", "badge": "BI & Analytics", "desc": "Retail customer analysis with multi-tier segmentation and Power BI executive dashboards.", "tech": ["Power BI", "SQL", "Pandas", "Segmentation"], "url": "https://github.com/Shubhamkeshri433/Customer-Shopping-Behavior-Analysis", "featured": true },
-  { "id": "dirty-cafe-data", "title": "Dirty Cafe Data Cleaning", "badge": "ETL & Cleansing", "desc": "Automated pipeline that turns messy cafe sales logs into structured analytics tables.", "tech": ["Python", "Pandas", "NumPy", "Data Cleaning"], "url": "https://github.com/Shubhamkeshri433/Dirty-Cafe-Data-Set", "featured": true },
-  { "id": "maven-fuzzy-factory", "title": "Maven Fuzzy Factory Analysis", "badge": "E-Commerce Analytics", "desc": "Website traffic, channel conversion funnels and revenue optimisation for an online store.", "tech": ["SQL", "Funnels", "KPI Metrics"], "url": "https://github.com/Shubhamkeshri433/Maven-Fuzzy-Factory-data-analysis-project", "featured": true },
-  { "id": "ssms-employee-db", "title": "SSMS SQL Employee Database", "badge": "SQL Architecture", "desc": "Advanced T-SQL: ranking functions, CTEs and salary analytics on an enterprise schema.", "tech": ["MSSQL", "T-SQL", "CTEs", "Window Functions"], "url": "https://github.com/Shubhamkeshri433/SSMS-SQL-Employee_Sample_Data_Base-Questions-Answers", "featured": true },
-  { "id": "excel-todo-dashboard", "title": "Productivity Dashboard in Excel", "badge": "Excel & Productivity", "desc": "Interactive task dashboard with conditional formatting and tracking.", "tech": ["Excel", "Lookups", "VBA", "Dashboard"], "url": "https://github.com/Shubhamkeshri433/To-Do-in-Excel", "featured": true }
+  {
+    "id": "ai-resume-ranker",
+    "title": "AI Resume Ranker",
+    "badge": "AI & NLP System",
+    "desc": "AI-powered candidate screening that ranks resumes against a job description using NLP and semantic vector similarity.",
+    "tech": [
+      "Python",
+      "Streamlit",
+      "NLP",
+      "Semantic Search"
+    ],
+    "url": "https://github.com/Shubhamkeshri433/AI-Resume-Ranker",
+    "featured": true
+  },
+  {
+    "id": "customer-shopping-behavior",
+    "title": "Customer Shopping Behavior Analysis",
+    "badge": "BI & Analytics",
+    "desc": "Retail customer analysis with multi-tier segmentation and Power BI executive dashboards.",
+    "tech": [
+      "Power BI",
+      "SQL",
+      "Pandas",
+      "Jupyter",
+      "Segmentation"
+    ],
+    "url": "https://github.com/Shubhamkeshri433/Customer-Shopping-Behavior-Analysis",
+    "featured": true
+  },
+  {
+    "id": "dirty-cafe-data",
+    "title": "Dirty Cafe Data Cleaning",
+    "badge": "ETL & Cleansing",
+    "desc": "Automated pipeline that turns messy cafe sales logs into structured analytics tables.",
+    "tech": [
+      "Excel",
+      "Power BI",
+      "Dashboard",
+      "Gamma"
+    ],
+    "url": "https://github.com/Shubhamkeshri433/Dirty-Cafe-Data-Set",
+    "featured": true
+  },
+  {
+    "id": "maven-fuzzy-factory",
+    "title": "Maven Fuzzy Factory Analysis",
+    "badge": "E-Commerce Analytics",
+    "desc": "Website traffic, channel conversion funnels and revenue optimisation for an online store.",
+    "tech": [
+      "Power BI",
+      "Dashboard"
+    ],
+    "url": "https://github.com/Shubhamkeshri433/Maven-Fuzzy-Factory-data-analysis-project",
+    "featured": true
+  },
+  {
+    "id": "ssms-employee-db",
+    "title": "SSMS SQL Employee Database",
+    "badge": "SQL Architecture",
+    "desc": "Advanced T-SQL: ranking functions, CTEs and salary analytics on an enterprise schema.",
+    "tech": [
+      "MSSQL",
+      "T-SQL",
+      "CTEs",
+      "Window Functions"
+    ],
+    "url": "https://github.com/Shubhamkeshri433/SSMS-SQL-Employee_Sample_Data_Base-Questions-Answers",
+    "featured": false
+  },
+  {
+    "id": "excel-todo-dashboard",
+    "title": "Productivity Dashboard in Excel",
+    "badge": "Excel & Productivity",
+    "desc": "Interactive task dashboard with conditional formatting and tracking.",
+    "tech": [
+      "Excel",
+      "Lookups",
+      "VBA",
+      "Dashboard"
+    ],
+    "url": "https://github.com/Shubhamkeshri433/To-Do-in-Excel",
+    "featured": false
+  }
 ]
