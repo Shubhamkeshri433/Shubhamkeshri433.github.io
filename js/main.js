@@ -3,12 +3,16 @@
  * simply stays as the readable static layout (no JS needed for any content).
  */
 const params = location.search;
-const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if (!reduce && !/[?&]static\b/.test(params)) {
+/* The inline script in index.html decided before first paint whether this visitor gets the 3D film (class "cine").
+   Phones, reduced-motion and ?static get the light page: no 3D code is downloaded, only the text is filled in. */
+if (document.documentElement.classList.contains('cine')) {
   start().catch((err) => {
     console.warn('Cinematic mode unavailable, showing static page.', err);
     document.documentElement.classList.remove('cine');
+    import('./hydrate.js').then((m) => m.hydrate()).catch(() => {});
   });
+} else {
+  import('./hydrate.js').then((m) => m.hydrate()).catch(() => {});
 }
 
 async function start() {

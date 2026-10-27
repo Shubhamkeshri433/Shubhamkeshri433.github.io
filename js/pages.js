@@ -1,6 +1,7 @@
 /* Renders Skills, Projects, Blog and Connect from data/*.json. All text is inserted as text nodes. */
 import { h, clear, safeUrl } from './dom.js';
 import { renderMarkdown } from './md.js';
+import { loadContent, applyShell, applyPage } from './content.js';
 
 const v = () => Math.floor(Date.now() / 60000); // cache-bust at most once a minute
 async function load(name) {
@@ -57,17 +58,23 @@ const pages = {
     const card = (cap, title, body, dark) => h('section', { class: 'sec' + (dark ? ' dark' : '') }, h('p', { class: 'cap' }, cap), h('h2', null, title), ...body);
     const copy = h('button', { class: 'btn btn-alt', type: 'button' }, 'Copy email');
     copy.addEventListener('click', async () => { try { await navigator.clipboard.writeText(s.email); copy.textContent = 'Copied!'; } catch { copy.textContent = s.email; } setTimeout(() => (copy.textContent = 'Copy email'), 2200); });
-    root.appendChild(card('Say hello', 'Email', [h('p', null, s.availability), h('p', { class: 'row-cta' }, h('a', { class: 'btn', href: `mailto:${s.email}` }, 'Email me'), copy)], true));
-    root.appendChild(card('Find me', 'Elsewhere', [
+    const L = (window.__content && window.__content.connect) || {};
+    root.appendChild(card(L.sayCap || 'Say hello', L.sayTitle || 'Email', [h('p', null, s.availability), h('p', { class: 'row-cta' }, h('a', { class: 'btn', href: `mailto:${s.email}` }, L.emailLabel || 'Email me'), copy)], true));
+    root.appendChild(card(L.findCap || 'Find me', L.findTitle || 'Elsewhere', [
       h('p', null, s.location),
       h('p', { class: 'row-cta' },
-        s.github && h('a', { class: 'btn btn-alt', href: safeUrl(s.github), target: '_blank', rel: 'noopener noreferrer' }, 'GitHub'),
-        s.linkedin && h('a', { class: 'btn btn-alt', href: safeUrl(s.linkedin), target: '_blank', rel: 'noopener noreferrer' }, 'LinkedIn'),
+        s.github && h('a', { class: 'btn btn-alt', href: safeUrl(s.github), target: '_blank', rel: 'noopener noreferrer' }, L.githubLabel || 'GitHub'),
+        s.linkedin && h('a', { class: 'btn btn-alt', href: safeUrl(s.linkedin), target: '_blank', rel: 'noopener noreferrer' }, L.linkedinLabel || 'LinkedIn'),
         (s.extra || []).map((l) => h('a', { class: 'btn btn-alt', href: safeUrl(l.url), target: '_blank', rel: 'noopener noreferrer' }, l.label)))]));
-    if (s.education) root.appendChild(h('section', { class: 'sec full' }, h('p', { class: 'cap' }, 'Background'), h('h2', null, s.name), h('p', null, `${s.role}. ${s.education}`)));
+    if (s.education) root.appendChild(h('section', { class: 'sec full' }, h('p', { class: 'cap' }, L.backgroundCap || 'Background'), h('h2', null, s.name), h('p', null, `${s.role}. ${s.education}`)));
   },
 };
 
 const root = document.getElementById('content');
 const page = document.body.dataset.page;
-if (root && pages[page]) pages[page](root).catch(() => fail(root, 'Could not load this page. Please try again in a moment.'));
+(async () => {
+  const c = await loadContent();
+  window.__content = c;
+  applyShell(c); applyPage(c, page);
+  if (root && pages[page]) await pages[page](root);
+})().catch(() => fail(root, 'Could not load this page. Please try again in a moment.'));

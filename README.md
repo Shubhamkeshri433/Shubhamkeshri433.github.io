@@ -1,24 +1,40 @@
 # Shubham Keshri — portfolio
 
-A scroll-driven, manga-style film of my journey (past, present, future), built with plain HTML, CSS and JavaScript plus a self-hosted Three.js bundle. Deployed on GitHub Pages.
+A scroll-driven, manga-style film of my journey (past, present, future), plus Skills, Projects, Blog and Connect pages and an owner-only dashboard. Plain HTML, CSS and JavaScript with a self-hosted Three.js bundle. Hosted on GitHub Pages: https://shubhamkeshri433.github.io
 
-## Design
-Black-and-white manga page: angled panels, speed-line bursts, speech bubbles, halftone texture and a single red accent. The 3D sky, clouds and instrument are rendered in black and white with ink outlines, halftone dots and cel-shaded bands (see `GradeShader` in `js/shaders.js`).
+## What visitors see
+- **Desktop:** the 3D scroll film (black-and-white manga look).
+- **Phones, reduced-motion and `?static`:** a light page with the same content and no 3D (smooth, no battery drain). Add `?3d` to a phone address to force the animation.
+- **Link previews** (WhatsApp, LinkedIn, X): `og-image.png` plus the Open Graph tags in every page head.
+
+## Everything is editable from the dashboard
+All text lives in `data/*.json`, so nothing needs code edits:
+
+| File | Controls |
+|---|---|
+| `data/site.json` | name, role, intro, email, links, education, extra links |
+| `data/skills.json` | skill categories and items |
+| `data/projects.json` | projects (title, text, tech, link, featured) |
+| `data/posts.json` | blog posts (Markdown, drafts) |
+| `data/content.json` | every heading, caption and paragraph of the home story, page headings and intros, nav labels, footer, button labels |
+
+Open `/admin/` (see `ADMIN.md` for setup). Tabs: Overview, Profile, Skills, Projects, Blog, Page text, Raw JSON, Security. **Raw JSON** edits any data file directly.
+
+Things that stay in code (change the files by hand): the 3D scene, colours and layout (`css/manga.css`), the link-preview image (`og-image.png`) and the meta tags in each page head.
 
 ## Structure
-- `index.html` the scroll film. Its text is the fallback; `js/hydrate.js` fills name, role, contact links, toolbox and projects from `data/*.json` before the 3D scene starts.
-- `skills.html`, `projects.html`, `blog.html`, `connect.html` content pages rendered by `js/pages.js` from the JSON files (DOM nodes only, no innerHTML). `js/md.js` is a safe Markdown renderer for blog posts; `js/dom.js` has small helpers.
-- `data/site.json`, `skills.json`, `projects.json`, `posts.json` all editable content. Set `"draft": true` on a post to hide it.
-- `css/manga.css` all styling, including the 404 and privacy pages.
-- `js/main.js` entry, renderer and scroll smoothing. `js/world.js` the 3D scene. `js/director.js` camera path and per-chapter grading. `js/ui.js` fades story panels and drives the project card. `js/path.js` flight path and timing tables. `js/shaders.js` sky, clouds and the manga post-process.
-- `js/vendor/three.bundle.js` Three.js r186, bundled by `tools/build.sh`.
-- `404.html`, `privacy.html` standalone pages.
+- `index.html` the scroll film; its text is the fallback if data fails to load.
+- `skills.html`, `projects.html`, `blog.html`, `connect.html` content pages (rendered by `js/pages.js`).
+- `privacy.html`, `404.html` standalone pages.
+- `admin/index.html`, `css/admin.css`, `js/admin.js`, `js/config.js` dashboard.
+- `js/content.js` applies `content.json`; `js/hydrate.js` fills the home page; `js/md.js` safe Markdown; `js/dom.js` helpers (no `innerHTML` anywhere).
+- `js/main.js`, `world.js`, `director.js`, `ui.js`, `path.js`, `shaders.js` the 3D film; `js/vendor/three.bundle.js` Three.js r186.
+- `og-image.png` link preview, `favicon-32.png`, `favicon-192.png`, `favicon.ico`, `apple-touch-icon.png` tab icons (the SK logo), `robots.txt`.
 
-- `admin/index.html`, `css/admin.css`, `js/admin.js`, `js/config.js` owner-only dashboard that edits `data/*.json` through the GitHub API. Setup and security notes: `ADMIN.md`.
-
-## Behaviour
-- Without WebGL, with reduced motion, or with `?static`, the page shows a readable static layout with every project and link.
-- `?fast` is a testing flag that skips the intro and snaps the scroll.
+## Security notes (this repo is public)
+- No secrets are stored in the repo. The dashboard needs your own GitHub token, typed in the browser; it is never in a file. See `ADMIN.md`.
+- Everything in `data/` is public. Only write what you want everyone to read.
+- Never commit tokens, `.env` files or keys. `.gitignore` already skips build leftovers.
 
 ## Run locally
 ES modules need a server: `python3 -m http.server`, then open http://localhost:8000.

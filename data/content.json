@@ -1,0 +1,82 @@
+{
+  "brand": "SK",
+  "nav": {
+    "skills": "Skills",
+    "projects": "Projects",
+    "blog": "Blog",
+    "connect": "Connect"
+  },
+  "footer": "© 2026 Shubham Keshri",
+  "home": {
+    "hero": {
+      "cap": "Chapter 0 · Opening",
+      "hint": "Scroll to begin"
+    },
+    "past": {
+      "cap": "Chapter 1 · The past · 2023",
+      "title": "It began with a question",
+      "body": "I joined Amity University, Delhi for a Bachelor of Computer Application and chose **Data Analysis** as my specialization. I wanted to know how a pile of numbers becomes a clear answer."
+    },
+    "learn": {
+      "cap": "Chapter 2 · Learning the tools · 2024",
+      "title": "Then the tools",
+      "body": "SQL first: T-SQL, CTEs, window functions. Then Python and Pandas, Excel and Power BI. Self-driven projects followed, and each one taught me something the classroom did not.",
+      "chips": [
+        "SQL",
+        "Python",
+        "Power BI",
+        "Excel"
+      ]
+    },
+    "present": {
+      "cap": "Chapter 3 · The present · now",
+      "title": "What I build today",
+      "body": "Pipelines, dashboards and AI apps. Keep scrolling and the work flies past, one project at a time."
+    },
+    "kit": {
+      "cap": "Chapter 3 · The toolbox",
+      "title": "What’s in the bag"
+    },
+    "future": {
+      "cap": "Chapter 4 · The future · next",
+      "title": "Where I’m headed",
+      "body": "Data Analyst, BI and AI Developer roles, and internships. I want to build the systems that let a team ask a question and trust the answer: cleaner pipelines, sharper dashboards, and AI agents that do real work."
+    },
+    "quote": "“Without data, you’re just another person with an opinion.”",
+    "contact": {
+      "cap": "Final chapter · Your turn",
+      "title": "Let’s build something useful",
+      "emailLabel": "Email me",
+      "githubLabel": "GitHub",
+      "linkedinLabel": "LinkedIn"
+    }
+  },
+  "pages": {
+    "skills": {
+      "title": "Skills",
+      "intro": "Everything I build with, grouped by what it is for."
+    },
+    "projects": {
+      "title": "Projects",
+      "intro": "Pipelines, dashboards and AI apps. Every one links to its repository."
+    },
+    "blog": {
+      "title": "Blog",
+      "intro": "Short write-ups of what I build and what I learn along the way."
+    },
+    "connect": {
+      "title": "Connect",
+      "intro": "Open to roles and internships. The quickest way to reach me is email."
+    }
+  },
+  "connect": {
+    "sayCap": "Say hello",
+    "sayTitle": "Email",
+    "emailLabel": "Email me",
+    "findCap": "Find me",
+    "findTitle": "Elsewhere",
+    "githubLabel": "GitHub",
+    "linkedinLabel": "LinkedIn",
+    "backgroundCap": "Background"
+  }
+}

@@ -1,5 +1,6 @@
 /* Fills the home page from data/*.json before the 3D film starts. If anything fails, the text already in index.html stays. */
 import { h, clear, safeUrl } from './dom.js';
+import { loadContent, applyShell, applyHome } from './content.js';
 
 const v = () => Math.floor(Date.now() / 60000);
 async function load(name) {
@@ -14,7 +15,9 @@ async function load(name) {
 const $ = (s) => document.querySelector(s);
 
 export async function hydrate() {
-  const [site, skills, projects] = await Promise.all([load('site').catch(() => null), load('skills').catch(() => null), load('projects').catch(() => null)]);
+  const [site, skills, projects, content] = await Promise.all([load('site').catch(() => null), load('skills').catch(() => null), load('projects').catch(() => null), loadContent()]);
+  applyShell(content);
+  applyHome(content);
 
   if (site) {
     const [first, ...rest] = String(site.name || '').trim().split(/\s+/);

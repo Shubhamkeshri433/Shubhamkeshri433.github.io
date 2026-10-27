@@ -31,3 +31,6 @@ button:disabled{opacity:.5;cursor:wait}
 .preview img{max-width:100%}
 .stats{display:flex;flex-wrap:wrap;gap:14px}.stat{border:2px solid var(--ink);background:#fff;padding:12px 18px;min-width:130px}.stat b{display:block;font:2.2rem var(--disp)}
 code{font-family:var(--mono);font-size:.9em;background:var(--grey);padding:1px 4px}
+
+fieldset.group{border:2px solid var(--ink);margin:14px 0;padding:6px 14px 14px;background:#fff}
+fieldset.group legend{font:1.2rem var(--disp);letter-spacing:.04em;padding:0 8px}

@@ -4,7 +4,7 @@ import { renderMarkdown } from './md.js';
 
 const API = 'https://api.github.com';
 const VAULT_KEY = 'sk_admin_vault';
-const FILES = ['site', 'skills', 'projects', 'posts'];
+const FILES = ['site', 'skills', 'projects', 'posts', 'content'];
 const $app = document.getElementById('app');
 
 const S = { token: null, user: null, files: {}, tab: 'overview', postIdx: 0, msg: {}, idle: null, fails: 0 };
@@ -79,7 +79,7 @@ function touch() {
 ['pointerdown', 'keydown'].forEach((ev) => document.addEventListener(ev, touch, true));
 
 /* ---------- data ---------- */
-const DEFAULTS = { site: {}, skills: [], projects: [], posts: [] };
+const DEFAULTS = { site: {}, skills: [], projects: [], posts: [], content: {} };
 async function loadAll() {
   await Promise.all(FILES.map(async (n) => {
     try {
@@ -127,7 +127,7 @@ function check(label, value, onChange) {
 }
 function markDirty() {
   const d = document.getElementById('dirtyflag');
-  if (d) d.textContent = dirty(S.tab) ? 'Unsaved changes' : '';
+  if (d) d.textContent = dirty(S.tab === 'raw' ? S.raw : S.tab) ? 'Unsaved changes' : '';
 }
 function saveBar(n, validate) {
   const btn = h('button', { type: 'button' }, 'Save to GitHub');
@@ -273,7 +273,56 @@ function tabSecurity() {
     h('p', { class: 'note' }, 'Use a fine-grained token limited to this repository with only "Contents: Read and write", set an expiry, and keep GitHub two-factor authentication on. Revoke the token in GitHub settings if a device is lost.'));
 }
 
-const TABS = [['overview', 'Overview', tabOverview], ['site', 'Profile', tabProfile], ['skills', 'Skills', tabSkills], ['projects', 'Projects', tabProjects], ['posts', 'Blog', tabBlog], ['security', 'Security', tabSecurity]];
+/* Page text: a form built from data/content.json, so every word on the site can be changed. */
+const humanize = (k) => k.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_-]/g, ' ').replace(/^./, (c) => c.toUpperCase());
+function deepFields(obj, depth = 0) {
+  const out = [];
+  for (const k of Object.keys(obj)) {
+    const v = obj[k];
+    if (v && typeof v === 'object' && !Array.isArray(v)) {
+      out.push(h('fieldset', { class: 'group' }, h('legend', null, humanize(k)), ...deepFields(v, depth + 1)));
+    } else if (Array.isArray(v)) {
+      out.push(field(humanize(k) + ' (comma separated)', v.join(', '), (x) => (obj[k] = list(x))));
+    } else {
+      const val = v == null ? '' : String(v);
+      out.push(field(humanize(k), val, (x) => (obj[k] = x), { area: val.length > 70 || /body|intro|quote/i.test(k) }));
+    }
+  }
+  return out;
+}
+function tabContent() {
+  const d = S.files.content.data;
+  return h('div', { class: 'card' }, h('h2', null, 'Page text'),
+    h('p', { class: 'note' }, 'Every heading, caption and paragraph on the home story and the Skills, Projects, Blog and Connect pages. In paragraphs you can use **bold**, *italic* and [links](https://…). Leave a box empty to keep the built-in text.'),
+    ...deepFields(d), saveBar('content', null));
+}
+
+/* Raw JSON: edit any data file directly, for anything the forms do not cover. */
+function tabRaw() {
+  const names = FILES;
+  S.raw = S.raw || names[0];
+  const sel = h('select', { 'aria-label': 'Choose data file' }, ...names.map((n) => h('option', { value: n }, `data/${n}.json`)));
+  sel.value = S.raw;
+  sel.addEventListener('change', () => { S.raw = sel.value; render(); });
+  const f = S.files[S.raw];
+  const ta = h('textarea', { class: 'big', spellcheck: 'false', 'aria-label': 'JSON' });
+  ta.value = JSON.stringify(f.data, null, 2);
+  const note = h('p', { class: 'msg' });
+  ta.addEventListener('input', () => {
+    try { f.data = JSON.parse(ta.value); note.className = 'msg ok'; note.textContent = 'Valid JSON'; } catch (e) { note.className = 'msg err'; note.textContent = 'Not valid JSON yet: ' + e.message; }
+    markDirty();
+  });
+  const raw = S.raw;
+  return h('div', { class: 'card' }, h('h2', null, 'Raw JSON'),
+    h('p', { class: 'note' }, 'Advanced. Changes apply only while the JSON is valid. Keep the same shape as the original or the site may show less.'),
+    sel, ta, note,
+    saveBar(raw, () => {
+      try { JSON.parse(ta.value); } catch (e) { return 'Fix the JSON first: ' + e.message; }
+      return Array.isArray(DEFAULTS[raw]) !== Array.isArray(f.data) ? 'This file must stay a ' + (Array.isArray(DEFAULTS[raw]) ? 'list [ ]' : 'object { }') + '.' : null;
+    }));
+}
+
+const TABS = [['overview', 'Overview', tabOverview], ['site', 'Profile', tabProfile], ['skills', 'Skills', tabSkills], ['projects', 'Projects', tabProjects], ['posts', 'Blog', tabBlog], ['content', 'Page text', tabContent], ['raw', 'Raw JSON', tabRaw], ['security', 'Security', tabSecurity]];
 
 function render() {
   if (!S.token) return;

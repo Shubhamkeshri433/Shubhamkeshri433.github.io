@@ -5,14 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Shubham Keshri — Data Analyst &amp; AI Developer</title>
   <meta name="description" content="A scroll-through film of Shubham Keshri's journey, past to present to future. Data Analyst and AI Developer: SQL, Python, Power BI, machine learning.">
-  <meta name="author" content="Shubham Keshri">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Shubham Keshri">
   <meta property="og:title" content="Shubham Keshri — Data Analyst &amp; AI Developer">
-  <meta property="og:description" content="Fly through the journey: past, present, future.">
+  <meta property="og:description" content="A scroll-through film of Shubham Keshri's journey, past to present to future. Data Analyst and AI Developer: SQL, Python, Power BI, machine learning.">
   <meta property="og:url" content="https://shubhamkeshri433.github.io/">
+  <meta property="og:image" content="https://shubhamkeshri433.github.io/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Shubham Keshri, Data Analyst and AI Developer">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://shubhamkeshri433.github.io/og-image.png">
+  <meta name="author" content="Shubham Keshri">
   <meta name="theme-color" content="#0a0a0a">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="alternate icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+  <link rel="shortcut icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +31,9 @@
     /* Decide up front, before first paint, so a visitor sees the title card and never a flash of the plain page. */
     (function () {
       var d = document.documentElement;
-      var ok = !window.matchMedia('(prefers-reduced-motion: reduce)').matches && !/[?&]static\b/.test(location.search);
+      /* Phones get the light page (no 3D): smooth scrolling and no battery drain. Add ?3d to the address to force the animation. */
+      var phone = window.matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 700 && !/[?&]3d\b/.test(location.search);
+      var ok = !phone && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && !/[?&]static\b/.test(location.search);
       if (!ok) return;
       d.classList.add('cine');
       try { history.scrollRestoration = 'manual'; } catch (e) {}
