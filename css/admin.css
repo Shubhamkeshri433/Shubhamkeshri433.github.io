@@ -34,3 +34,29 @@ code{font-family:var(--mono);font-size:.9em;background:var(--grey);padding:1px 4
 
 fieldset.group{border:2px solid var(--ink);margin:14px 0;padding:6px 14px 14px;background:#fff}
 fieldset.group legend{font:1.2rem var(--disp);letter-spacing:.04em;padding:0 8px}
+
+/* blog editor */
+.hidden{display:none}
+.toolbar{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:6px 0 10px}
+button.tbtn{font-size:1rem;padding:4px 10px;margin:0 2px 4px 0;box-shadow:2px 2px 0 var(--ink)}
+.tbsel{width:auto;padding:5px 6px;margin:0 2px 4px 0}
+.editor-canvas{max-width:100%;height:auto;border:2px solid var(--ink);background:repeating-conic-gradient(#ccc 0 25%,#fff 0 50%) 0 0/16px 16px;touch-action:none;cursor:crosshair;display:block;margin:8px 0}
+.imged input[type=range]{padding:0}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:10px}
+.thumb{border:2px solid var(--ink);padding:8px;background:#fff;word-break:break-all}
+.thumb img{width:100%;height:110px;object-fit:cover;display:block;margin-bottom:6px}
+/* preview of a post, same look as the site */
+.prose{max-width:70ch;font-size:17px;line-height:1.7}
+.prose h2,.prose h3,.prose h4{font-family:var(--disp);font-weight:400;text-transform:uppercase;letter-spacing:.03em;margin:22px 0 6px}
+.prose h2{font-size:30px}.prose h3{font-size:25px}.prose h4{font-size:20px}
+.prose code{font-family:var(--mono);background:var(--grey);padding:1px 5px}
+.prose pre{background:var(--ink);color:#fff;padding:12px;overflow-x:auto}
+.prose blockquote{margin:14px 0;padding:6px 16px;border-left:6px solid var(--accent);font-family:var(--disp);font-size:22px}
+.prose figure{margin:18px 0}.prose figure img{display:block;max-width:100%;height:auto;border:3px solid var(--ink)}
+.prose figcaption{font:12px var(--mono);text-transform:uppercase;margin-top:6px}
+.prose .video{position:relative;aspect-ratio:16/9;margin:18px 0;border:3px solid var(--ink);background:#000}
+.prose .video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.prose .center{text-align:center}.prose mark{background:#ffe26b}
+.prose u{text-decoration-color:var(--accent);text-decoration-thickness:3px}
+.prose .fx-display{font-family:var(--disp);font-size:1.25em}.prose .fx-mono{font-family:var(--mono);font-size:.9em}
+.prose .fx-big{font-size:1.6em}.prose .fx-small{font-size:.8em}

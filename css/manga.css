@@ -304,3 +304,17 @@ html:not(.cine) main { padding-top: 18px; }
 
 /* No flash of old text: hide the page until data/content.json has been applied (JS adds .hy, and removes it right after) */
 html.hy .hud, html.hy main, html.hy .doc-hero, html.hy .pg-head, html.hy .page-foot { visibility: hidden; }
+
+/* blog extras: photos, video, text styles */
+.prose figure { margin: 22px 0; }
+.prose figure img { display: block; max-width: 100%; height: auto; border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--accent); background: var(--paper-2); }
+.prose figcaption { margin-top: 10px; font-family: var(--mono); font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; }
+.prose .video { position: relative; aspect-ratio: 16 / 9; margin: 22px 0; border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--accent); background: var(--ink); }
+.prose .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.prose .center { text-align: center; }
+.prose mark { background: #ffe26b; color: var(--ink); padding: 0 3px; }
+.prose u { text-decoration-thickness: 3px; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+.prose .fx-display { font-family: var(--display); letter-spacing: 0.03em; font-size: 1.25em; }
+.prose .fx-mono { font-family: var(--mono); font-size: 0.9em; }
+.prose .fx-big { font-size: 1.6em; line-height: 1.2; }
+.prose .fx-small { font-size: 0.8em; }

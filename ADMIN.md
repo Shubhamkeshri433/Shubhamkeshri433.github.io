@@ -11,6 +11,14 @@ The dashboard lives at `/admin/` (https://shubhamkeshri433.github.io/admin/). It
    - Permissions → Repository → **Contents: Read and write**. Nothing else.
 4. Open `/admin/`, paste the token, sign in. Tick "Remember on this device" only on a computer you trust; you then choose a passphrase (10+ characters) that encrypts the token in your browser.
 
+## Writing blog posts
+- The Blog tab has a toolbar: Bold, Italic, Underline, Strike, Highlight, font styles (Comic, Code font, Big, Small), headings, lists, quote, centre, link, code, divider.
+- **Photo** opens an editor in the page: drag to crop (free or fixed shape), rotate, flip, brightness, contrast, maximum width and quality. It shows the final size. **Upload & insert** saves the photo to `assets/blog/` in your repo (a commit) and adds it to the post.
+- **Library** lists photos you uploaded; Insert puts one in the post, Delete removes it from the repo.
+- **Video** embeds a YouTube link (privacy-enhanced mode). Large video files are not stored in the repo.
+- Press **Save to GitHub** to publish the post text itself. Photos are uploaded straight away, the post only when you save.
+- Photos are compressed to WebP in your browser (usually 50–300 KB). Keep an eye on repo size if you add very many.
+
 ## Everyday use
 - **Page text** tab: every heading and paragraph of the home story and the other pages. **Raw JSON** tab: edit any data file directly (advanced).
 - **Profile / Skills / Projects / Blog** tabs for the main content.
