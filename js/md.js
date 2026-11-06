@@ -1,8 +1,13 @@
-/* Tiny, safe Markdown renderer. Builds DOM nodes (no innerHTML), only http/https/mailto links. */
+/* Tiny, safe Markdown renderer. Builds DOM nodes (no innerHTML), only http/https/mailto links.
+   Extras: ++underline++  ~~strike~~  ==highlight==  {{display: text}} {{mono: text}} {{big: text}} {{small: text}}
+   Blocks:  ![caption](assets/blog/photo.webp)   @[youtube](link-or-id)   ":: centred paragraph"  */
 const SAFE_URL = /^(https?:\/\/|mailto:)/i;
+const SAFE_IMG = /^(assets\/blog\/[A-Za-z0-9._-]+|https:\/\/[^\s"'<>]+)$/;
+const FX = new Set(['display', 'mono', 'big', 'small']);
+let OPTS = {};
 
 function inline(text, parent) {
-  const re = /(`[^`]+`)|(\*\*[^*]+\*\*)|(\*[^*\s][^*]*\*)|(\[[^\]]+\]\([^)\s]+\))/g;
+  const re = /(`[^`]+`)|(\*\*[^*]+\*\*)|(\*[^*\s][^*]*\*)|(\+\+[^+]+\+\+)|(~~[^~]+~~)|(==[^=]+==)|(\{\{[a-z]+:\s*[^}]+\}\})|(\[[^\]]+\]\([^)\s]+\))/g;
   let last = 0, m;
   while ((m = re.exec(text))) {
     if (m.index > last) parent.appendChild(document.createTextNode(text.slice(last, m.index)));
@@ -10,7 +15,13 @@ function inline(text, parent) {
     if (m[1]) { const c = document.createElement('code'); c.textContent = t.slice(1, -1); parent.appendChild(c); }
     else if (m[2]) { const b = document.createElement('strong'); inline(t.slice(2, -2), b); parent.appendChild(b); }
     else if (m[3]) { const i = document.createElement('em'); inline(t.slice(1, -1), i); parent.appendChild(i); }
-    else {
+    else if (m[4] || m[5] || m[6]) {
+      const el = document.createElement(m[4] ? 'u' : m[5] ? 's' : 'mark'); inline(t.slice(2, -2), el); parent.appendChild(el);
+    } else if (m[7]) {
+      const fx = /^\{\{([a-z]+):\s*([^}]+)\}\}$/.exec(t);
+      if (fx && FX.has(fx[1])) { const sp = document.createElement('span'); sp.className = 'fx-' + fx[1]; inline(fx[2], sp); parent.appendChild(sp); }
+      else parent.appendChild(document.createTextNode(t));
+    } else {
       const [, label, url] = /\[([^\]]+)\]\(([^)\s]+)\)/.exec(t);
       if (SAFE_URL.test(url)) {
         const a = document.createElement('a'); a.href = url; a.textContent = label;
@@ -23,7 +34,14 @@ function inline(text, parent) {
   if (last < text.length) parent.appendChild(document.createTextNode(text.slice(last)));
 }
 
-export function renderMarkdown(src) {
+function ytId(v) {
+  const m = /^(?:https?:\/\/(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?(?:[^#\s]*&)?v=|embed\/|shorts\/)|youtu\.be\/))?([A-Za-z0-9_-]{11})(?:[?&#\/][^\s]*)?$/.exec(v.trim());
+  return m ? m[1] : null;
+}
+
+/* opts.base: prefix for assets/blog paths (the dashboard lives one folder deeper). opts.resolve(path): optional local preview source. */
+export function renderMarkdown(src, opts) {
+  OPTS = opts || {};
   const frag = document.createDocumentFragment();
   const lines = String(src || '').replace(/\r\n?/g, '\n').split('\n');
   let i = 0;
@@ -38,6 +56,36 @@ export function renderMarkdown(src) {
       const pre = document.createElement('pre'), code = document.createElement('code');
       code.textContent = buf.join('\n'); pre.appendChild(code); frag.appendChild(pre); continue;
     }
+    const im = /^!\[([^\]]*)\]\(([^)\s]+)\)\s*$/.exec(line);
+    if (im) {
+      flush(); i++;
+      if (SAFE_IMG.test(im[2])) {
+        const fig = document.createElement('figure'), img = document.createElement('img');
+        const local = OPTS.resolve && OPTS.resolve(im[2]);
+        img.src = local || (/^https:/.test(im[2]) ? im[2] : (OPTS.base || '') + im[2]);
+        img.alt = im[1]; img.loading = 'lazy'; img.decoding = 'async';
+        fig.appendChild(img);
+        if (im[1]) { const fc = document.createElement('figcaption'); fc.textContent = im[1]; fig.appendChild(fc); }
+        frag.appendChild(fig);
+      }
+      continue;
+    }
+    const yt = /^@\[youtube\]\(([^)\s]+)\)\s*$/.exec(line);
+    if (yt) {
+      flush(); i++;
+      const id = ytId(yt[1]);
+      if (id) {
+        const box = document.createElement('div'); box.className = 'video';
+        const f = document.createElement('iframe');
+        f.src = 'https://www.youtube-nocookie.com/embed/' + id; f.title = 'YouTube video'; f.loading = 'lazy';
+        f.allow = 'accelerometer; encrypted-media; picture-in-picture'; f.referrerPolicy = 'strict-origin-when-cross-origin';
+        f.setAttribute('allowfullscreen', ''); f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
+        box.appendChild(f); frag.appendChild(box);
+      }
+      continue;
+    }
+    const ct = /^::\s?(.*)$/.exec(line);
+    if (ct) { flush(); const p = document.createElement('p'); p.className = 'center'; inline(ct[1], p); frag.appendChild(p); i++; continue; }
     const h = /^(#{1,3})\s+(.*)$/.exec(line);
     if (h) { flush(); const e = document.createElement('h' + (h[1].length + 1)); inline(h[2], e); frag.appendChild(e); i++; continue; }
     if (/^---+\s*$/.test(line)) { flush(); frag.appendChild(document.createElement('hr')); i++; continue; }

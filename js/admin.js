@@ -1,13 +1,14 @@
 import { CONFIG } from './config.js';
 import { h, clear } from './dom.js';
 import { renderMarkdown } from './md.js';
+import { buildToolbar, insertBlock, createImageEditor } from './blog-editor.js';
 
 const API = 'https://api.github.com';
 const VAULT_KEY = 'sk_admin_vault';
 const FILES = ['site', 'skills', 'projects', 'posts', 'content'];
 const $app = document.getElementById('app');
 
-const S = { token: null, user: null, files: {}, tab: 'overview', postIdx: 0, msg: {}, idle: null, fails: 0 };
+const S = { token: null, user: null, files: {}, tab: 'overview', postIdx: 0, local: {}, media: null, editorEl: null, bodyTa: null, showLib: false, msg: {}, idle: null, fails: 0 };
 
 /* ---------- helpers ---------- */
 const enc = new TextEncoder(), dec = new TextDecoder();
@@ -67,7 +68,7 @@ async function verifyToken(token) {
 }
 
 function lock(reason) {
-  S.token = null; S.user = null; S.files = {}; S.msg = {};
+  S.token = null; S.user = null; S.files = {}; S.msg = {}; S.local = {}; S.media = null; S.editorEl = null; S.bodyTa = null;
   clearTimeout(S.idle);
   renderLogin(reason);
 }
@@ -220,21 +221,87 @@ function tabProjects() {
     }));
 }
 
+/* ----- blog photos: upload to assets/blog/ in the repo, list, delete ----- */
+const mediaDir = `${repoPath}/contents/assets/blog`;
+async function loadMedia() {
+  try {
+    const r = await gh(`${mediaDir}?ref=${encodeURIComponent(CONFIG.branch)}`);
+    S.media = (Array.isArray(r) ? r : []).filter((x) => x.type === 'file' && /\.(webp|jpe?g|png|gif)$/i.test(x.name)).map((x) => ({ name: x.name, sha: x.sha, size: x.size }));
+  } catch (e) { if (e.status === 404) S.media = []; else throw e; }
+}
+async function uploadPhoto(blob, ext) {
+  const rnd = crypto.getRandomValues(new Uint32Array(1))[0].toString(36).slice(0, 5);
+  const name = `${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${rnd}.${ext}`;
+  const content = bytesB64(new Uint8Array(await blob.arrayBuffer()));
+  const r = await gh(`${mediaDir}/${name}`, { method: 'PUT', body: JSON.stringify({ message: `Dashboard: add photo ${name}`, content, branch: CONFIG.branch }) });
+  const url = await new Promise((res) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(blob); });
+  S.local['assets/blog/' + name] = url;
+  (S.media = S.media || []).unshift({ name, sha: r.content.sha, size: blob.size });
+  return name;
+}
+
+function mediaLibrary(ta) {
+  if (!S.showLib) return null;
+  if (S.media === null) { loadMedia().then(render).catch((e) => { setMsg('media', 'err', e.message); S.media = []; render(); }); return h('div', { class: 'item' }, h('p', { class: 'note' }, 'Loading your photos…')); }
+  const close = h('button', { type: 'button', class: 'alt tbtn' }, 'Close');
+  close.addEventListener('click', () => { S.showLib = false; render(); });
+  const refresh = h('button', { type: 'button', class: 'alt tbtn' }, 'Refresh');
+  refresh.addEventListener('click', () => { S.media = null; render(); });
+  const items = S.media.map((m) => {
+    const path = 'assets/blog/' + m.name;
+    const ins = h('button', { type: 'button', class: 'tbtn' }, 'Insert');
+    ins.addEventListener('click', () => { insertBlock(ta, `![](${path})`); });
+    const del = h('button', { type: 'button', class: 'danger tbtn' }, 'Delete');
+    del.addEventListener('click', async () => {
+      if (!confirm(`Delete ${m.name}? Posts that use it will lose the picture.`)) return;
+      del.disabled = true;
+      try { await gh(`${mediaDir}/${m.name}`, { method: 'DELETE', body: JSON.stringify({ message: `Dashboard: delete photo ${m.name}`, sha: m.sha, branch: CONFIG.branch }) }); S.media = S.media.filter((x) => x !== m); setMsg('media', 'ok', 'Deleted.'); }
+      catch (e) { setMsg('media', 'err', e.message); }
+      render();
+    });
+    return h('div', { class: 'thumb' }, h('img', { src: S.local[path] || '../' + path, alt: m.name, loading: 'lazy' }), h('span', { class: 'note' }, `${m.name} · ${Math.round(m.size / 1024)} KB`), h('div', null, ins, del));
+  });
+  return h('div', { class: 'item' }, h('h3', null, 'Your photos'), close, refresh,
+    items.length ? h('div', { class: 'thumbs' }, ...items) : h('p', { class: 'note' }, 'No photos yet. Use the Photo button to add one.'));
+}
+
 function tabBlog() {
   const d = S.files.posts.data;
   if (S.postIdx >= d.length) S.postIdx = Math.max(0, d.length - 1);
   const p = d[S.postIdx];
   const sel = h('select', { 'aria-label': 'Choose post' }, ...d.map((x, i) => h('option', { value: i }, (x.draft ? '[draft] ' : '') + (x.title || x.slug || 'untitled'))));
   sel.value = String(S.postIdx);
-  sel.addEventListener('change', () => { S.postIdx = +sel.value; render(); });
+  sel.addEventListener('change', () => { S.postIdx = +sel.value; S.editorEl = null; render(); });
   const add = h('button', { type: 'button', class: 'alt' }, '+ New post');
-  add.addEventListener('click', () => { d.unshift({ slug: '', title: '', date: new Date().toISOString().slice(0, 10), summary: '', tags: [], draft: true, body: '' }); S.postIdx = 0; render(); });
+  add.addEventListener('click', () => { d.unshift({ slug: '', title: '', date: new Date().toISOString().slice(0, 10), summary: '', tags: [], draft: true, body: '' }); S.postIdx = 0; S.editorEl = null; render(); });
   const parts = [h('h2', null, 'Blog'), h('label', null, 'Post'), sel, add];
   if (p) {
-    const prev = h('div', { class: 'preview', 'aria-label': 'Preview' });
-    const upd = () => { clear(prev); prev.appendChild(renderMarkdown(p.body)); };
+    const prev = h('div', { class: 'preview prose', 'aria-label': 'Preview' });
+    const ropts = { base: '../', resolve: (path) => S.local[path] };
+    const upd = () => { clear(prev); prev.appendChild(renderMarkdown(p.body, ropts)); };
     upd();
-    const bodyField = field('Body (Markdown)', p.body || '', (v) => { p.body = v; upd(); }, { area: true, big: true });
+    const ta = h('textarea', { class: 'big', id: 'postbody', spellcheck: 'true', autocomplete: 'off' });
+    ta.value = p.body || '';
+    ta.addEventListener('input', () => { p.body = ta.value; upd(); markDirty(); });
+    S.bodyTa = ta;
+    const host = h('div', null);
+    if (S.editorEl) host.appendChild(S.editorEl);
+    const startEditor = async (file) => {
+      if (file.size > 25 * 1024 * 1024) { setMsg('media', 'err', 'That photo is too big (max 25 MB).'); return render(); }
+      try {
+        S.editorEl = await createImageEditor(file, {
+          onCancel: () => { S.editorEl = null; render(); },
+          onDone: async (blob, ext, alt) => {
+            try { const name = await uploadPhoto(blob, ext); insertBlock(ta, `![${alt}](assets/blog/${name})`); S.editorEl = null; setMsg('media', 'ok', 'Photo uploaded and added to the post. Remember to press Save to GitHub for the post itself.'); }
+            catch (e) { setMsg('media', 'err', e.message); }
+            render();
+          },
+        });
+        setMsg('media', '', '');
+      } catch (e) { setMsg('media', 'err', e.message); }
+      render();
+    };
+    const toolbar = buildToolbar(ta, { onPickImage: startEditor, onLibrary: () => { S.showLib = !S.showLib; render(); } });
     const del = h('button', { type: 'button', class: 'danger' }, 'Delete post');
     del.addEventListener('click', () => { if (confirm('Delete this post?')) { d.splice(S.postIdx, 1); render(); } });
     parts.push(
@@ -242,7 +309,9 @@ function tabBlog() {
         field('Date (YYYY-MM-DD)', p.date || '', (v) => (p.date = v)), field('Tags (comma separated)', (p.tags || []).join(', '), (v) => (p.tags = list(v)))),
       field('Summary', p.summary || '', (v) => (p.summary = v), { area: true }),
       check('Draft (hidden from the public site)', p.draft, (v) => (p.draft = v)),
-      bodyField, h('label', null, 'Preview'), prev, del);
+      h('label', { for: 'postbody' }, 'Body'), toolbar, host, mediaLibrary(ta), ta,
+      h('p', { class: 'note' }, S.editorEl ? '' : 'Tip: select text, then press a button. Photos you add are cropped and compressed here, then stored in your repo under assets/blog/.'),
+      msgEl('media'), h('label', null, 'Preview'), prev, del);
   } else parts.push(h('p', { class: 'note' }, 'No posts yet. Click "New post".'));
   parts.push(saveBar('posts', () => {
     const slugs = new Set();
