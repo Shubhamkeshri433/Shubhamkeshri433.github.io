@@ -52,4 +52,6 @@ The dashboard lives at `/dashboard/` (https://shubhamkeshri433.github.io/dashboa
 - Click a picture to drag its corners, or use Small / Medium / Full. The width is saved in the post as `{w=50}` after the image.
 - Image studio: move and resize the crop box, rotate, flip, adjust, pick the width, quality and format (WebP, JPEG, PNG), and see the file size before you upload.
 - Drag a picture or video sideways: drop it in the left or right third to place it there, and the text wraps around it. Drop it in the middle for a centred block. The Left / Center / Right buttons do the same. Videos can be resized too. Saved as `{w=50,a=left}` after the item; phones always show them full width.
-- The side panels (Posts, Add blocks) can be minimized, or hidden with Hide panels to give the editor the full width.
+- Blog opens on your list of posts. Nothing is selected until you pick one.
+- The editor uses the full width. Blocks are in the Add block popup, and slug, date, tags and summary are behind the Settings button.
+- The main menu on the left can be collapsed to icons with the button next to search. It remembers your choice.

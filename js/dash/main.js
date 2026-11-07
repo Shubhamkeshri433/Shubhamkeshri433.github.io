@@ -75,7 +75,8 @@ function render() {
   VIEWS.forEach(([id, title, ic, , section]) => {
     if (section && section !== lastSection) { nav.appendChild(h('div', { class: 'nav-sec' }, section)); lastSection = section; }
     const a = h('a', { href: '#/' + id, class: 'nav' + (S.tab === id ? ' on' : '') }, icon(ic, 18), h('span', null, title), c[id] != null ? h('em', { 'data-count': id }, String(c[id])) : null);
-    a.addEventListener('click', () => document.body.classList.remove('drawer'));
+    a.title = title;
+    a.addEventListener('click', () => { document.body.classList.remove('drawer'); if (id === 'blog') { S.postIdx = null; if (location.hash === '#/blog') render(); } });
     nav.appendChild(a);
   });
   nav.appendChild(h('div', { class: 'side-foot' }, h('a', { href: '../', target: '_blank', rel: 'noopener' }, 'View site ↗'), h('button', { type: 'button', class: 'linkish', onClick: null }, 'Lock')));
@@ -88,8 +89,10 @@ function render() {
   const save = btn('Save to GitHub', { icon: 'save', kind: 'primary', onClick: reviewModal });
   const searchBtn = h('button', { type: 'button', class: 'searchbox' }, icon('search', 16), h('span', null, 'Search or jump to…'), h('kbd', null, 'Ctrl K'));
   searchBtn.addEventListener('click', palette);
-  const burger = iconBtn('menu', 'Menu', () => document.body.classList.toggle('drawer'));
-  burger.classList.add('burger');
+  const navPref = { get: () => { try { return localStorage.getItem('sk_dash_nav'); } catch (e) { return null; } }, set: (v) => { try { localStorage.setItem('sk_dash_nav', v); } catch (e) { /* ignore */ } } };
+  document.body.classList.toggle('nav-min', navPref.get() === '0');
+  const burger = iconBtn('menu', 'Show or hide the menu', () => { if (window.matchMedia('(max-width:820px)').matches) document.body.classList.toggle('drawer'); else navPref.set(document.body.classList.toggle('nav-min') ? '0' : '1'); });
+  burger.classList.add('navtog');
   const top = h('header', { class: 'top' }, burger, searchBtn, h('span', { class: 'grow' }), live, chip, iconBtn('sun', 'Switch light / dark theme', () => toggleTheme()), review, save);
   bar = { chip, review, save };
 

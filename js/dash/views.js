@@ -244,43 +244,63 @@ function previewPost(p) {
   const dev = selectFld('Device', 'desktop', [['desktop', 'Desktop'], ['phone', 'Phone']], (v) => wrap.classList.toggle('phone', v === 'phone'));
   modal({ title: 'Preview', body: h('div', null, dev, wrap), wide: true });
 }
+const pref = { get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } } };
+const wordCount = (b) => (b || '').replace(/!\[[^\]]*\]\([^)]*\)(\{[^}]*\})?/g, ' ').replace(/[#*>`_~=\[\]()!{}:+-]/g, ' ').split(/\s+/).filter(Boolean).length;
 function blog() {
   const d = D('posts');
-  if (S.postIdx == null || S.postIdx >= d.length) S.postIdx = 0;
+  if (S.postIdx != null && S.postIdx >= d.length) S.postIdx = null;
+  return S.postIdx == null ? blogList(d) : blogEdit(d);
+}
+/* Blog opens on the list: nothing is selected until you choose a post. */
+function blogList(d) {
+  const open = (i) => { S.postIdx = i; rerender(); };
+  const cards = d.length ? h('div', { class: 'post-cards' }, ...d.map((x, i) => {
+    const w = wordCount(x.body);
+    const c = h('article', { class: 'post-card', tabindex: '0', role: 'button', 'aria-label': 'Edit ' + (x.title || 'Untitled post') },
+      h('div', { class: 'pc-top' }, h('span', { class: 'pill ' + (x.draft ? 'wn' : 'ok') }, x.draft ? 'Draft' : 'Live'), h('small', null, x.date || 'No date')),
+      h('h3', null, x.title || 'Untitled post'),
+      h('p', { class: 'muted pc-sum' }, x.summary || 'No summary yet.'),
+      h('div', { class: 'pc-foot' }, h('small', null, `${w} words · ${Math.max(1, Math.round(w / 200))} min`), h('span', { class: 'row-btns' }, btn('Edit', { icon: 'edit', kind: 'primary', onClick: (e) => { e.stopPropagation(); open(i); } }),
+        iconBtn('trash', 'Delete post', async (e) => { e.stopPropagation(); if (await confirmBox('Delete post', `Delete "${x.title || 'this post'}"?`, 'Delete', true)) { d.splice(i, 1); changed(); rerender(); } }, 'danger'))));
+    c.addEventListener('click', () => open(i));
+    c.addEventListener('keydown', (e) => { if (e.target === c && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); open(i); } });
+    return c;
+  })) : empty('No posts yet.', btn('Write your first post', { kind: 'primary', icon: 'plus', onClick: newPost }));
+  return h('div', { class: 'page' }, head('Blog', d.length ? `${d.length} post${d.length === 1 ? '' : 's'}. Choose one to edit, or start a new one.` : 'Write your first post.', btn('New post', { icon: 'plus', kind: 'primary', onClick: newPost })), cards);
+}
+function blogEdit(d) {
   const p = d[S.postIdx];
-  const list = h('div', { class: 'plist' }, ...d.map((x, i) => {
-    const b = h('button', { type: 'button', class: 'pl-item' + (i === S.postIdx ? ' on' : '') }, h('b', null, x.title || 'Untitled'), h('small', null, `${x.date || ''} · ${x.draft ? 'draft' : 'live'}`));
-    b.addEventListener('click', () => { S.postIdx = i; rerender(); }); return b;
-  }));
-  let center, side, leftExtra = null;
-  if (p) {
-    const meta = h('div', { class: 'ed-meta' });
-    const updMeta = () => { const w = (p.body || '').replace(/!\[[^\]]*\]\([^)]*\)(\{w=\d+\})?/g, ' ').replace(/[#*>`_~=\[\]()!{}:+-]/g, ' ').split(/\s+/).filter(Boolean).length; meta.textContent = `${p.date || 'No date'} · ${w} words · ${Math.max(1, Math.round(w / 200))} min read · ${p.draft ? 'Draft' : 'Published'}`; };
-    updMeta();
-    const ed = createVisualEditor({ markdown: p.body || '', base: '../', resolve: (x) => S.local[x], toast, onChange: (md) => { p.body = md; updMeta(); changed(); }, onPhoto: (f, fg) => photoFlow(f, ed, fg), onEditPhoto: (img, fg) => photoFlow(null, ed, fg, img), onLibrary: () => library(ed) });
-    S.cleanup = () => ed.destroy();
-    leftExtra = h('aside', { class: 'card blocks-card' }, h('h3', null, h('span', null, 'Add blocks')), h('p', { class: 'muted bk-hint' }, 'Click to add at the cursor. Drag any picture, video or paragraph to move it.'),
-      h('div', { class: 'bk-grid' }, ...ed.items.map((it) => { const b = h('button', { type: 'button', class: 'bk' }, h('span', { class: 'bk-ic' }, ['image', 'folder', 'code'].includes(it.glyph) ? icon(it.glyph, 18) : h('span', { class: 'bm-glyph' }, it.glyph)), h('span', null, it.label)); b.addEventListener('mousedown', (e) => e.preventDefault()); b.addEventListener('click', () => ed.addBlock(it.label)); return b; })));
-    const slugEl = fld('Slug (web address)', p, 'slug', { hint: 'lowercase-with-dashes' });
-    center = h('div', { class: 'editor-col' }, h('div', { class: 'title-in' }, (() => { const t = h('input', { type: 'text', value: p.title || '', placeholder: 'Post title', 'aria-label': 'Post title' }); t.addEventListener('input', () => { const auto = !p.slug || p.slug === slugify(prevT.get(p) || ''); p.title = t.value; const li = document.querySelector('.pl-item.on b'); if (li) li.textContent = t.value || 'Untitled'; if (auto) { p.slug = slugify(t.value); slugEl.querySelector('input').value = p.slug; } prevT.set(p, t.value); changed(); }); prevT.set(p, p.title); return t; })()), meta, ed.el);
-    side = h('aside', { class: 'side card' }, h('h3', null, h('span', null, 'Post settings')), slugEl, fld('Date (YYYY-MM-DD)', p, 'date'), chips('Tags', p.tags = p.tags || [], (v) => (p.tags = v)),
-      fld('Summary', p, 'summary', { area: true, rows: 3, hint: 'Shown on the blog list and in link previews.' }), (() => { const seg = h('div', { class: 'st-seg' }); const paint = () => seg.replaceChildren(...[[true, 'Draft'], [false, 'Published']].map(([v, t]) => { const b = h('button', { type: 'button', class: !!p.draft === v ? 'on' : '' }, t); b.addEventListener('click', () => { p.draft = v; changed(); paint(); updMeta(); const li = document.querySelector('.pl-item.on small'); if (li) li.textContent = `${p.date || ''} · ${p.draft ? 'draft' : 'live'}`; }); return b; })); paint(); return h('div', { class: 'fld' }, h('label', null, 'Status'), seg, h('small', null, 'Drafts stay hidden from the public site.')); })(),
-      (() => { const pv = h('div', { class: 'sp' }, h('div', { class: 'sp-url' }, 'shubhamkeshri433.github.io › blog'), h('div', { class: 'sp-t' }), h('div', { class: 'sp-d' })); const up = () => { pv.querySelector('.sp-t').textContent = p.title || 'Untitled post'; pv.querySelector('.sp-d').textContent = (p.summary || 'Add a summary to control this text.').slice(0, 160) + ((p.summary || '').length > 160 ? '…' : ''); }; up(); pv.update = up; setTimeout(() => { const root = pv.closest('.blog-grid'); if (root) root.addEventListener('input', up); }, 0); return h('div', { class: 'fld' }, h('label', null, 'Search preview'), pv, h('small', null, 'Keep the summary under 160 characters.')); })(),
-      h('div', { class: 'stack-btns' }, btn('Preview', { icon: 'eye', onClick: () => previewPost(p) }), btn('Delete post', { icon: 'trash', kind: 'danger', onClick: async () => { if (await confirmBox('Delete post', `Delete "${p.title || 'this post'}"?`, 'Delete', true)) { d.splice(S.postIdx, 1); changed(); rerender(); } } })));
-  } else { center = h('div', { class: 'editor-col' }, empty('No posts yet.', btn('Write your first post', { kind: 'primary', icon: 'plus', onClick: newPost }))); side = h('div'); }
-  const pref = { get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } } };
-  const fold = (card, key) => {
-    const hd = card.querySelector('h3'), b2 = h('button', { type: 'button', class: 'fold', 'aria-label': 'Minimize or open this panel', title: 'Minimize / open' });
-    const paint = () => { const c = card.classList.contains('collapsed'); b2.textContent = c ? '▸' : '▾'; b2.setAttribute('aria-expanded', String(!c)); };
-    if (pref.get(key) === '0') card.classList.add('collapsed');
-    b2.addEventListener('click', () => { card.classList.toggle('collapsed'); pref.set(key, card.classList.contains('collapsed') ? '0' : '1'); paint(); });
-    hd.appendChild(b2); paint(); return card;
-  };
-  const postsCard = fold(h('aside', { class: 'card plist-card' }, h('h3', null, h('span', null, 'Posts')), list), 'sk_dash_posts');
-  if (leftExtra) fold(leftExtra, 'sk_dash_blocks');
-  const grid = h('div', { class: 'blog-grid' + (pref.get('sk_dash_left') === '0' ? ' left-off' : '') }, h('div', { class: 'left-col' }, postsCard, leftExtra), center, side);
-  const panelBtn = btn(grid.classList.contains('left-off') ? 'Show panels' : 'Hide panels', { icon: 'menu', onClick: () => { const off = grid.classList.toggle('left-off'); pref.set('sk_dash_left', off ? '0' : '1'); panelBtn.lastChild.textContent = off ? 'Show panels' : 'Hide panels'; } });
-  return h('div', { class: 'page wide-page' }, head('Blog', `${d.length} posts. Write it here exactly as it will look on the site.`, panelBtn, btn('New post', { icon: 'plus', kind: 'primary', onClick: newPost })), grid);
+  const meta = h('div', { class: 'ed-meta' });
+  const updMeta = () => { const w = wordCount(p.body); meta.textContent = `${p.date || 'No date'} · ${w} words · ${Math.max(1, Math.round(w / 200))} min read · ${p.draft ? 'Draft' : 'Published'}`; };
+  updMeta();
+  const ed = createVisualEditor({ markdown: p.body || '', base: '../', resolve: (x) => S.local[x], toast, onChange: (md) => { p.body = md; updMeta(); changed(); }, onPhoto: (f, fg) => photoFlow(f, ed, fg), onEditPhoto: (img, fg) => photoFlow(null, ed, fg, img), onLibrary: () => library(ed) });
+  /* Blocks live in a small popup, so the writing area keeps the full width. */
+  const pop = h('div', { class: 'pop hidden', role: 'menu', 'aria-label': 'Blocks' }, h('p', { class: 'muted bk-hint' }, 'Click to add at the cursor. Drag any picture, video or paragraph to move it.'),
+    h('div', { class: 'bk-grid' }, ...ed.items.map((it) => { const b = h('button', { type: 'button', class: 'bk', role: 'menuitem' }, h('span', { class: 'bk-ic' }, ['image', 'folder', 'code'].includes(it.glyph) ? icon(it.glyph, 18) : h('span', { class: 'bm-glyph' }, it.glyph)), h('span', null, it.label)); b.addEventListener('mousedown', (e) => e.preventDefault()); b.addEventListener('click', () => { pop.classList.add('hidden'); ed.addBlock(it.label); }); return b; })));
+  const bkBtn = btn('Add block', { icon: 'plus', onClick: () => { pop.classList.toggle('hidden'); bkBtn.setAttribute('aria-expanded', String(!pop.classList.contains('hidden'))); } });
+  bkBtn.addEventListener('mousedown', (e) => e.preventDefault());
+  const outside = (e) => { if (!e.target.closest || !e.target.closest('.pop-wrap')) pop.classList.add('hidden'); };
+  const esc = (e) => { if (e.key === 'Escape') pop.classList.add('hidden'); };
+  document.addEventListener('pointerdown', outside, true); document.addEventListener('keydown', esc);
+  S.cleanup = () => { ed.destroy(); document.removeEventListener('pointerdown', outside, true); document.removeEventListener('keydown', esc); };
+  const slugEl = fld('Slug (web address)', p, 'slug', { hint: 'lowercase-with-dashes' });
+  const titleIn = (() => { const t = h('input', { type: 'text', value: p.title || '', placeholder: 'Post title', 'aria-label': 'Post title' }); t.addEventListener('input', () => { const auto = !p.slug || p.slug === slugify(prevT.get(p) || ''); p.title = t.value; if (auto) { p.slug = slugify(t.value); slugEl.querySelector('input').value = p.slug; } prevT.set(p, t.value); sp.update(); changed(); }); prevT.set(p, p.title); return t; })();
+  const sp = h('div', { class: 'sp' }, h('div', { class: 'sp-url' }, 'shubhamkeshri433.github.io › blog'), h('div', { class: 'sp-t' }), h('div', { class: 'sp-d' }));
+  sp.update = () => { sp.querySelector('.sp-t').textContent = p.title || 'Untitled post'; sp.querySelector('.sp-d').textContent = (p.summary || 'Add a summary to control this text.').slice(0, 160) + ((p.summary || '').length > 160 ? '…' : ''); };
+  sp.update();
+  const center = h('div', { class: 'editor-col' }, h('div', { class: 'title-in' }, titleIn), meta, ed.el);
+  const side = h('aside', { class: 'side card' }, h('h3', null, h('span', null, 'Post settings')), slugEl, fld('Date (YYYY-MM-DD)', p, 'date'), chips('Tags', p.tags = p.tags || [], (v) => (p.tags = v)),
+    fld('Summary', p, 'summary', { area: true, rows: 3, hint: 'Shown on the blog list and in link previews.' }),
+    (() => { const seg = h('div', { class: 'st-seg' }); const paint = () => seg.replaceChildren(...[[true, 'Draft'], [false, 'Published']].map(([v, t]) => { const b = h('button', { type: 'button', class: !!p.draft === v ? 'on' : '' }, t); b.addEventListener('click', () => { p.draft = v; changed(); paint(); updMeta(); }); return b; })); paint(); return h('div', { class: 'fld' }, h('label', null, 'Status'), seg, h('small', null, 'Drafts stay hidden from the public site.')); })(),
+    h('div', { class: 'fld' }, h('label', null, 'Search preview'), sp, h('small', null, 'Keep the summary under 160 characters.')),
+    h('div', { class: 'stack-btns' }, btn('Delete post', { icon: 'trash', kind: 'danger', onClick: async () => { if (await confirmBox('Delete post', `Delete "${p.title || 'this post'}"?`, 'Delete', true)) { d.splice(S.postIdx, 1); S.postIdx = null; changed(); rerender(); } } })));
+  const grid = h('div', { class: 'blog-grid ed-grid' + (pref.get('sk_dash_set') === '1' ? ' set-on' : '') }, center, side);
+  grid.addEventListener('input', () => sp.update());
+  const setBtn = btn('Settings', { icon: 'gear', onClick: () => { const on = grid.classList.toggle('set-on'); pref.set('sk_dash_set', on ? '1' : '0'); setBtn.setAttribute('aria-pressed', String(on)); } });
+  setBtn.setAttribute('aria-pressed', String(grid.classList.contains('set-on')));
+  const bar = h('div', { class: 'ed-bar' }, btn('← All posts', { onClick: () => { S.postIdx = null; rerender(); } }), h('span', { class: 'pill ' + (p.draft ? 'wn' : 'ok') }, p.draft ? 'Draft' : 'Live'), h('span', { class: 'grow' }),
+    h('span', { class: 'pop-wrap' }, bkBtn, pop), btn('Preview', { icon: 'eye', onClick: () => previewPost(p) }), setBtn);
+  return h('div', { class: 'page wide-page ed-page' }, bar, grid);
 }
 
 /* ---------- media ---------- */
