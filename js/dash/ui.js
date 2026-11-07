@@ -108,7 +108,7 @@ export function modal({ title, body, actions = [], wide = false, onClose }) {
   const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
   document.addEventListener('keydown', onKey, true);
   back.addEventListener('mousedown', (e) => { if (e.target === back) close(); });
-  box.append(h('div', { class: 'modal-h' }, h('h3', null, title || ''), iconBtn('x', 'Close', close)), h('div', { class: 'modal-b' }, body), actions.length ? h('div', { class: 'modal-f' }, ...actions) : null);
+  box.append(...[h('div', { class: 'modal-h' }, h('h3', null, title || ''), iconBtn('x', 'Close', close)), h('div', { class: 'modal-b' }, body), actions.length ? h('div', { class: 'modal-f' }, ...actions) : null].filter(Boolean));
   back.appendChild(box); document.body.appendChild(back);
   const f = box.querySelector('input,textarea,select,button.btn.primary,button'); if (f) setTimeout(() => f.focus(), 30);
   return { close, box };
