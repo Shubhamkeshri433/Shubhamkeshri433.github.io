@@ -48,10 +48,8 @@
     "tech": [
       "Jupyter Notebook",
       "matplotlib",
-      "matplotlib-figures",
-      "matplotlib-pyplot",
-      "matplotlib-python",
-      "pandas"
+      "seaborn",
+      "python"
     ],
     "url": "https://github.com/Shubhamkeshri433/US-Honey-Visualisation-Practice",
     "featured": false
