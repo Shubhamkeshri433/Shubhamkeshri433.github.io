@@ -37,7 +37,6 @@ The dashboard lives at `/dashboard/` (https://shubhamkeshri433.github.io/dashboa
 
 ## Features
 
-(`/admin/` now just redirects here.)
 
 - Dark and light theme (toggle in the top bar), Ctrl+K search, Ctrl+S review and save.
 - **Review changes** shows exactly what will be committed; **Save to GitHub** commits it.
