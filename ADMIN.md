@@ -34,3 +34,14 @@ The dashboard lives at `/admin/` (https://shubhamkeshri433.github.io/admin/). It
 - A strict Content-Security-Policy allows scripts only from this site and network calls only to `api.github.com`. Content is rendered without `innerHTML`, so post text cannot inject scripts.
 - The failed-attempt delay in the page is a courtesy, not a defence. Real protection is GitHub's token + 2FA. If a token leaks, revoke it in GitHub settings immediately.
 - `robots.txt` hides `/admin/` from search engines. That is not security either.
+
+## New dashboard (`/dashboard/`)
+
+Same token, same passphrase and same security rules as `/admin/`. Highlights:
+
+- Dark and light theme (toggle in the top bar), Ctrl+K search, Ctrl+S review and save.
+- **Review changes** shows exactly what will be committed; **Save to GitHub** commits it.
+- Visual blog editor: bold, italic, headings, lists, links, photos (crop, rotate, brightness, resize), YouTube. Posts are still stored as Markdown.
+- Projects: **Import from GitHub** lists all your repositories; tick the ones you want, then edit or delete them.
+- Drafts are autosaved in this browser and offered back after a crash. History, site health, media library and backup are under Tools.
+- It only edits `data/*.json` and `assets/blog/`; the public site's look is untouched.

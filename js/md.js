@@ -7,19 +7,23 @@ const FX = new Set(['display', 'mono', 'big', 'small']);
 let OPTS = {};
 
 function inline(text, parent) {
-  const re = /(`[^`]+`)|(\*\*[^*]+\*\*)|(\*[^*\s][^*]*\*)|(\+\+[^+]+\+\+)|(~~[^~]+~~)|(==[^=]+==)|(\{\{[a-z]+:\s*[^}]+\}\})|(\[[^\]]+\]\([^)\s]+\))/g;
+  /* groups: 1 code, 2 bold+italic, 3 bold, 4 italic, 5 underline, 6 strike, 7 highlight, 8 font style, 9 link */
+  const re = /(`[^`]+`)|(\*\*\*[^*]+\*\*\*)|(\*\*(?:[^*]|\*(?!\*))+\*\*)|(\*(?!\*)(?:\*\*[^*]+\*\*|[^*])+\*)|(\+\+[^+]+\+\+)|(~~[^~]+~~)|(==[^=]+==)|(\{\{[a-z]+:\s*[^}]+\}\})|(\[[^\]]+\]\([^)\s]+\))/g;
   let last = 0, m;
+  const wrap = (tag, inner) => { const el = document.createElement(tag); inline(inner, el); parent.appendChild(el); return el; };
   while ((m = re.exec(text))) {
     if (m.index > last) parent.appendChild(document.createTextNode(text.slice(last, m.index)));
     const t = m[0];
     if (m[1]) { const c = document.createElement('code'); c.textContent = t.slice(1, -1); parent.appendChild(c); }
-    else if (m[2]) { const b = document.createElement('strong'); inline(t.slice(2, -2), b); parent.appendChild(b); }
-    else if (m[3]) { const i = document.createElement('em'); inline(t.slice(1, -1), i); parent.appendChild(i); }
-    else if (m[4] || m[5] || m[6]) {
-      const el = document.createElement(m[4] ? 'u' : m[5] ? 's' : 'mark'); inline(t.slice(2, -2), el); parent.appendChild(el);
-    } else if (m[7]) {
+    else if (m[2]) { const b = document.createElement('strong'); const i = document.createElement('em'); inline(t.slice(3, -3), i); b.appendChild(i); parent.appendChild(b); }
+    else if (m[3]) wrap('strong', t.slice(2, -2));
+    else if (m[4]) wrap('em', t.slice(1, -1));
+    else if (m[5]) wrap('u', t.slice(2, -2));
+    else if (m[6]) wrap('s', t.slice(2, -2));
+    else if (m[7]) wrap('mark', t.slice(2, -2));
+    else if (m[8]) {
       const fx = /^\{\{([a-z]+):\s*([^}]+)\}\}$/.exec(t);
-      if (fx && FX.has(fx[1])) { const sp = document.createElement('span'); sp.className = 'fx-' + fx[1]; inline(fx[2], sp); parent.appendChild(sp); }
+      if (fx && FX.has(fx[1])) { const sp = wrap('span', fx[2]); sp.className = 'fx-' + fx[1]; }
       else parent.appendChild(document.createTextNode(t));
     } else {
       const [, label, url] = /\[([^\]]+)\]\(([^)\s]+)\)/.exec(t);
@@ -63,7 +67,7 @@ export function renderMarkdown(src, opts) {
         const fig = document.createElement('figure'), img = document.createElement('img');
         const local = OPTS.resolve && OPTS.resolve(im[2]);
         img.src = local || (/^https:/.test(im[2]) ? im[2] : (OPTS.base || '') + im[2]);
-        img.alt = im[1]; img.loading = 'lazy'; img.decoding = 'async';
+        img.alt = im[1]; img.loading = 'lazy'; img.decoding = 'async'; img.dataset.path = im[2];
         fig.appendChild(img);
         if (im[1]) { const fc = document.createElement('figcaption'); fc.textContent = im[1]; fig.appendChild(fc); }
         frag.appendChild(fig);
@@ -80,7 +84,7 @@ export function renderMarkdown(src, opts) {
         f.src = 'https://www.youtube-nocookie.com/embed/' + id; f.title = 'YouTube video'; f.loading = 'lazy';
         f.allow = 'accelerometer; encrypted-media; picture-in-picture'; f.referrerPolicy = 'strict-origin-when-cross-origin';
         f.setAttribute('allowfullscreen', ''); f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
-        box.appendChild(f); frag.appendChild(box);
+        box.dataset.yt = id; box.appendChild(f); frag.appendChild(box);
       }
       continue;
     }
