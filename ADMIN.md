@@ -44,3 +44,10 @@ The dashboard lives at `/dashboard/` (https://shubhamkeshri433.github.io/dashboa
 - Projects: **Import from GitHub** lists all your repositories; tick the ones you want, then edit or delete them.
 - Drafts are autosaved in this browser and offered back after a crash. History, site health, media library and backup are under Tools.
 - It only edits `data/*.json` and `assets/blog/`; the public site's look is untouched.
+
+## Blog editor
+
+- Select text to get a small toolbar (bold, italic, underline, strike, heading, link, highlight).
+- Press `+` on an empty line, or type `/`, to add an image, photo from your library, video, heading, list, quote, code block or divider.
+- Click a picture to drag its corners, or use Small / Medium / Full. The width is saved in the post as `{w=50}` after the image.
+- Image studio: move and resize the crop box, rotate, flip, adjust, pick the width, quality and format (WebP, JPEG, PNG), and see the file size before you upload.

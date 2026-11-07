@@ -2,7 +2,7 @@
 import { CONFIG, h, clear, S, FILES, DEFAULTS, clone, slugify, humanize, isHttps, ago, gh, repoPath, loadFile, listCommits, fileAt, dirty, dirtyNames, loadMedia, uploadPhoto, deletePhoto, usedPhotos, loadRepos, toast, lock, vaultForget, hasVault, toggleTheme, restoreDraft, dropDraft } from './core.js';
 import { icon, btn, iconBtn, fld, selectFld, chips, sw, card, empty, modal, confirmBox, promptBox, diffView, dragList, gripEl, moveArr, changed } from './ui.js';
 import { createVisualEditor } from './editor.js';
-import { createImageEditor } from '../blog-editor.js';
+import { createStudio } from './studio.js';
 import { renderMarkdown } from '../md.js';
 
 const pretty = (o) => JSON.stringify(o, null, 2);
@@ -198,20 +198,26 @@ function newPost() {
   d.unshift({ slug: '', title: '', date: new Date().toISOString().slice(0, 10), summary: '', tags: [], draft: true, body: '' });
   S.postIdx = 0; changed(); rerender();
 }
-function photoFlow(file, ed) {
-  const run = async (f) => {
-    if (f.size > 25 * 1024 * 1024) return toast('That photo is too big (max 25 MB).', 'err');
+function photoFlow(file, ed, fig, srcImg) {
+  const run = async (f, label, size) => {
+    if (f.size && f.size > 25 * 1024 * 1024) return toast('That photo is too big (max 25 MB).', 'err');
     let m;
     try {
-      const panel = await createImageEditor(f, {
+      const panel = await createStudio(f, {
+        name: label || f.name || 'photo', originalSize: size == null ? f.size || 0 : size,
         onCancel: () => m.close(),
         onDone: async (blob, ext, alt) => {
-          try { const name = await uploadPhoto(blob, ext); if (ed) ed.insertPhoto('assets/blog/' + name, alt); toast('Photo uploaded' + (ed ? ' and added to the post.' : '.')); m.close(); if (S.tab === 'media') rerender(); }
-          catch (e) { toast(e.message, 'err'); }
+          try {
+            const name = await uploadPhoto(blob, ext), path = 'assets/blog/' + name;
+            if (ed && fig && fig.isConnected) ed.replacePhoto(fig, path); else if (ed) ed.insertPhoto(path, alt);
+            toast('Photo uploaded' + (ed ? ' and added to the post.' : '.')); m.close(); if (S.tab === 'media') rerender();
+          } catch (e) { toast(e.message, 'err'); }
         } });
-      m = modal({ title: 'Edit photo', body: panel, wide: true });
+      m = modal({ title: 'Image studio', body: panel, wide: true });
+      m.box.classList.add('studio-m');
     } catch (e) { toast(e.message, 'err'); }
   };
+  if (srcImg) return run(srcImg, (srcImg.dataset.path || 'photo').split('/').pop(), 0);
   if (file) return run(file);
   const inp = h('input', { type: 'file', accept: 'image/png,image/jpeg,image/webp,image/gif', class: 'hidden', 'aria-label': 'Choose a photo' });
   document.body.appendChild(inp);
@@ -248,12 +254,16 @@ function blog() {
   }));
   let center, side;
   if (p) {
-    const ed = createVisualEditor({ markdown: p.body || '', base: '../', resolve: (x) => S.local[x], toast, onChange: (md) => { p.body = md; changed(); }, onPhoto: (f) => photoFlow(f, ed), onLibrary: () => library(ed) });
+    const meta = h('div', { class: 'ed-meta' });
+    const updMeta = () => { const w = (p.body || '').replace(/!\[[^\]]*\]\([^)]*\)(\{w=\d+\})?/g, ' ').replace(/[#*>`_~=\[\]()!{}:+-]/g, ' ').split(/\s+/).filter(Boolean).length; meta.textContent = `${p.date || 'No date'} · ${w} words · ${Math.max(1, Math.round(w / 200))} min read · ${p.draft ? 'Draft' : 'Published'}`; };
+    updMeta();
+    const ed = createVisualEditor({ markdown: p.body || '', base: '../', resolve: (x) => S.local[x], toast, onChange: (md) => { p.body = md; updMeta(); changed(); }, onPhoto: (f, fg) => photoFlow(f, ed, fg), onEditPhoto: (img, fg) => photoFlow(null, ed, fg, img), onLibrary: () => library(ed) });
     S.cleanup = () => ed.destroy();
     const slugEl = fld('Slug (web address)', p, 'slug', { hint: 'lowercase-with-dashes' });
-    center = h('div', { class: 'editor-col' }, h('div', { class: 'title-in' }, (() => { const t = h('input', { type: 'text', value: p.title || '', placeholder: 'Post title', 'aria-label': 'Post title' }); t.addEventListener('input', () => { const auto = !p.slug || p.slug === slugify(prevT.get(p) || ''); p.title = t.value; const li = document.querySelector('.pl-item.on b'); if (li) li.textContent = t.value || 'Untitled'; if (auto) { p.slug = slugify(t.value); slugEl.querySelector('input').value = p.slug; } prevT.set(p, t.value); changed(); }); prevT.set(p, p.title); return t; })()), ed.el);
+    center = h('div', { class: 'editor-col' }, h('div', { class: 'title-in' }, (() => { const t = h('input', { type: 'text', value: p.title || '', placeholder: 'Post title', 'aria-label': 'Post title' }); t.addEventListener('input', () => { const auto = !p.slug || p.slug === slugify(prevT.get(p) || ''); p.title = t.value; const li = document.querySelector('.pl-item.on b'); if (li) li.textContent = t.value || 'Untitled'; if (auto) { p.slug = slugify(t.value); slugEl.querySelector('input').value = p.slug; } prevT.set(p, t.value); changed(); }); prevT.set(p, p.title); return t; })()), meta, ed.el);
     side = h('aside', { class: 'side card' }, h('h3', null, h('span', null, 'Post settings')), slugEl, fld('Date (YYYY-MM-DD)', p, 'date'), chips('Tags', p.tags = p.tags || [], (v) => (p.tags = v)),
-      fld('Summary', p, 'summary', { area: true, rows: 3, hint: 'Shown on the blog list and in link previews.' }), sw('Draft', 'Hidden from the public site', p.draft, (v) => { p.draft = v; rerender(); }),
+      fld('Summary', p, 'summary', { area: true, rows: 3, hint: 'Shown on the blog list and in link previews.' }), (() => { const seg = h('div', { class: 'st-seg' }); const paint = () => seg.replaceChildren(...[[true, 'Draft'], [false, 'Published']].map(([v, t]) => { const b = h('button', { type: 'button', class: !!p.draft === v ? 'on' : '' }, t); b.addEventListener('click', () => { p.draft = v; changed(); paint(); updMeta(); const li = document.querySelector('.pl-item.on small'); if (li) li.textContent = `${p.date || ''} · ${p.draft ? 'draft' : 'live'}`; }); return b; })); paint(); return h('div', { class: 'fld' }, h('label', null, 'Status'), seg, h('small', null, 'Drafts stay hidden from the public site.')); })(),
+      (() => { const pv = h('div', { class: 'sp' }, h('div', { class: 'sp-url' }, 'shubhamkeshri433.github.io › blog'), h('div', { class: 'sp-t' }), h('div', { class: 'sp-d' })); const up = () => { pv.querySelector('.sp-t').textContent = p.title || 'Untitled post'; pv.querySelector('.sp-d').textContent = (p.summary || 'Add a summary to control this text.').slice(0, 160) + ((p.summary || '').length > 160 ? '…' : ''); }; up(); pv.update = up; setTimeout(() => { const root = pv.closest('.blog-grid'); if (root) root.addEventListener('input', up); }, 0); return h('div', { class: 'fld' }, h('label', null, 'Search preview'), pv, h('small', null, 'Keep the summary under 160 characters.')); })(),
       h('div', { class: 'stack-btns' }, btn('Preview', { icon: 'eye', onClick: () => previewPost(p) }), btn('Delete post', { icon: 'trash', kind: 'danger', onClick: async () => { if (await confirmBox('Delete post', `Delete "${p.title || 'this post'}"?`, 'Delete', true)) { d.splice(S.postIdx, 1); changed(); rerender(); } } })));
   } else { center = h('div', { class: 'editor-col' }, empty('No posts yet.', btn('Write your first post', { kind: 'primary', icon: 'plus', onClick: newPost }))); side = h('div'); }
   return h('div', { class: 'page wide-page' }, head('Blog', `${d.length} posts. Write it here exactly as it will look on the site.`, btn('New post', { icon: 'plus', kind: 'primary', onClick: newPost })),

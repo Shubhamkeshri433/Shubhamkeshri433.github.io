@@ -60,7 +60,7 @@ export function renderMarkdown(src, opts) {
       const pre = document.createElement('pre'), code = document.createElement('code');
       code.textContent = buf.join('\n'); pre.appendChild(code); frag.appendChild(pre); continue;
     }
-    const im = /^!\[([^\]]*)\]\(([^)\s]+)\)\s*$/.exec(line);
+    const im = /^!\[([^\]]*)\]\(([^)\s]+)\)(?:\{w=(\d{2,3})\})?\s*$/.exec(line);
     if (im) {
       flush(); i++;
       if (SAFE_IMG.test(im[2])) {
@@ -68,6 +68,8 @@ export function renderMarkdown(src, opts) {
         const local = OPTS.resolve && OPTS.resolve(im[2]);
         img.src = local || (/^https:/.test(im[2]) ? im[2] : (OPTS.base || '') + im[2]);
         img.alt = im[1]; img.loading = 'lazy'; img.decoding = 'async'; img.dataset.path = im[2];
+        const wp = im[3] ? Math.min(100, Math.max(10, +im[3])) : 100;
+        if (wp < 100) { fig.dataset.w = String(wp); fig.style.width = wp + '%'; fig.style.marginLeft = fig.style.marginRight = 'auto'; }
         fig.appendChild(img);
         if (im[1]) { const fc = document.createElement('figcaption'); fc.textContent = im[1]; fig.appendChild(fc); }
         frag.appendChild(fig);
