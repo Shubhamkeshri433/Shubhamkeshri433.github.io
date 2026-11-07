@@ -252,13 +252,15 @@ function blog() {
     const b = h('button', { type: 'button', class: 'pl-item' + (i === S.postIdx ? ' on' : '') }, h('b', null, x.title || 'Untitled'), h('small', null, `${x.date || ''} · ${x.draft ? 'draft' : 'live'}`));
     b.addEventListener('click', () => { S.postIdx = i; rerender(); }); return b;
   }));
-  let center, side;
+  let center, side, leftExtra = null;
   if (p) {
     const meta = h('div', { class: 'ed-meta' });
     const updMeta = () => { const w = (p.body || '').replace(/!\[[^\]]*\]\([^)]*\)(\{w=\d+\})?/g, ' ').replace(/[#*>`_~=\[\]()!{}:+-]/g, ' ').split(/\s+/).filter(Boolean).length; meta.textContent = `${p.date || 'No date'} · ${w} words · ${Math.max(1, Math.round(w / 200))} min read · ${p.draft ? 'Draft' : 'Published'}`; };
     updMeta();
     const ed = createVisualEditor({ markdown: p.body || '', base: '../', resolve: (x) => S.local[x], toast, onChange: (md) => { p.body = md; updMeta(); changed(); }, onPhoto: (f, fg) => photoFlow(f, ed, fg), onEditPhoto: (img, fg) => photoFlow(null, ed, fg, img), onLibrary: () => library(ed) });
     S.cleanup = () => ed.destroy();
+    leftExtra = h('aside', { class: 'card blocks-card' }, h('h3', null, h('span', null, 'Add blocks')), h('p', { class: 'muted bk-hint' }, 'Click to add at the cursor. Drag any picture, video or paragraph to move it.'),
+      h('div', { class: 'bk-grid' }, ...ed.items.map((it) => { const b = h('button', { type: 'button', class: 'bk' }, h('span', { class: 'bk-ic' }, ['image', 'folder', 'code'].includes(it.glyph) ? icon(it.glyph, 18) : h('span', { class: 'bm-glyph' }, it.glyph)), h('span', null, it.label)); b.addEventListener('mousedown', (e) => e.preventDefault()); b.addEventListener('click', () => ed.addBlock(it.label)); return b; })));
     const slugEl = fld('Slug (web address)', p, 'slug', { hint: 'lowercase-with-dashes' });
     center = h('div', { class: 'editor-col' }, h('div', { class: 'title-in' }, (() => { const t = h('input', { type: 'text', value: p.title || '', placeholder: 'Post title', 'aria-label': 'Post title' }); t.addEventListener('input', () => { const auto = !p.slug || p.slug === slugify(prevT.get(p) || ''); p.title = t.value; const li = document.querySelector('.pl-item.on b'); if (li) li.textContent = t.value || 'Untitled'; if (auto) { p.slug = slugify(t.value); slugEl.querySelector('input').value = p.slug; } prevT.set(p, t.value); changed(); }); prevT.set(p, p.title); return t; })()), meta, ed.el);
     side = h('aside', { class: 'side card' }, h('h3', null, h('span', null, 'Post settings')), slugEl, fld('Date (YYYY-MM-DD)', p, 'date'), chips('Tags', p.tags = p.tags || [], (v) => (p.tags = v)),
@@ -267,7 +269,7 @@ function blog() {
       h('div', { class: 'stack-btns' }, btn('Preview', { icon: 'eye', onClick: () => previewPost(p) }), btn('Delete post', { icon: 'trash', kind: 'danger', onClick: async () => { if (await confirmBox('Delete post', `Delete "${p.title || 'this post'}"?`, 'Delete', true)) { d.splice(S.postIdx, 1); changed(); rerender(); } } })));
   } else { center = h('div', { class: 'editor-col' }, empty('No posts yet.', btn('Write your first post', { kind: 'primary', icon: 'plus', onClick: newPost }))); side = h('div'); }
   return h('div', { class: 'page wide-page' }, head('Blog', `${d.length} posts. Write it here exactly as it will look on the site.`, btn('New post', { icon: 'plus', kind: 'primary', onClick: newPost })),
-    h('div', { class: 'blog-grid' }, h('aside', { class: 'card plist-card' }, h('h3', null, h('span', null, 'Posts')), list), center, side));
+    h('div', { class: 'blog-grid' }, h('div', { class: 'left-col' }, h('aside', { class: 'card plist-card' }, h('h3', null, h('span', null, 'Posts')), list), leftExtra), center, side));
 }
 
 /* ---------- media ---------- */
