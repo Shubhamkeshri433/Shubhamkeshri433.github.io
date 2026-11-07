@@ -67,7 +67,8 @@ export function createVisualEditor({ markdown, base = '../', resolve, onChange, 
       if (!c) { c = document.createElement('figcaption'); f.appendChild(c); }
       c.setAttribute('contenteditable', 'true'); c.setAttribute('data-ph', 'Add a caption');
     });
-    ed.querySelectorAll('.video').forEach((v) => v.setAttribute('contenteditable', 'false'));
+    ed.querySelectorAll('figure img').forEach((i) => { i.draggable = false; });
+    ed.querySelectorAll('.video').forEach((v) => { v.setAttribute('contenteditable', 'false'); if (!v.querySelector('.vshield')) v.appendChild(h('div', { class: 'vshield', title: 'Click to select, drag to move' })); });
     if (!ed.firstChild || !ed.lastChild || ed.lastChild.nodeName !== 'P') ed.appendChild(h('p', null, h('br')));
   };
   const load = (md) => { menu = null; figUi = null; selFig = null; clear(ed); ed.appendChild(renderMarkdown(md, { base, resolve })); prep(); };
@@ -99,11 +100,14 @@ export function createVisualEditor({ markdown, base = '../', resolve, onChange, 
   }
   function startResize(e, side) {
     e.preventDefault(); e.stopPropagation();
-    const fig = selFig, edW = ed.clientWidth - parseFloat(getComputedStyle(ed).paddingLeft) - parseFloat(getComputedStyle(ed).paddingRight);
-    const startW = fig.getBoundingClientRect().width, x0 = e.clientX; const dir = side.includes('w') ? -1 : 1;
+    const fig = selFig, hd = e.currentTarget, cs = getComputedStyle(ed);
+    const edW = ed.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const startW = fig.getBoundingClientRect().width, x0 = e.clientX, dir = side.includes('w') ? -1 : 1;
+    try { hd.setPointerCapture(e.pointerId); } catch (er) { /* ignore */ }
+    fig.classList.add('resizing');
     const mv = (ev) => setWidthLive(fig, ((startW + dir * (ev.clientX - x0) * 2) / edW) * 100);
-    const up = () => { document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); emit(); };
-    document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up);
+    const up = () => { hd.removeEventListener('pointermove', mv); hd.removeEventListener('pointerup', up); hd.removeEventListener('pointercancel', up); fig.classList.remove('resizing'); emit(); };
+    hd.addEventListener('pointermove', mv); hd.addEventListener('pointerup', up); hd.addEventListener('pointercancel', up);
   }
   function setWidthLive(fig, pct) {
     pct = Math.round(Math.min(100, Math.max(10, pct)));
@@ -119,7 +123,7 @@ export function createVisualEditor({ markdown, base = '../', resolve, onChange, 
       tb('Edit photo', () => onEditPhoto && onEditPhoto(fig.querySelector('img'), fig)), tb('Replace', () => onPhoto(null, fig)), h('span', { class: 'tsep' }),
       tb('Delete', () => { deselect(); fig.remove(); prep(); emit(); }, 'danger'));
     figUi = h('div', { class: 'fig-ui', contenteditable: 'false' }, bar, h('div', { class: 'fig-badge' }),
-      ...['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].map((sd) => { const hd = h('div', { class: 'fig-h fig-' + sd }); if (sd !== 'n' && sd !== 's') hd.addEventListener('pointerdown', (ev) => startResize(ev, sd)); return hd; }));
+      ...['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].map((sd) => { const hd = h('div', { class: 'fig-h fig-' + sd }); hd.addEventListener('pointerdown', (ev) => startResize(ev, sd === 'n' || sd === 's' ? 'e' : sd)); return hd; }));
     fig.appendChild(figUi); placeUi();
   }
   ed.addEventListener('click', (e) => {
@@ -178,6 +182,55 @@ export function createVisualEditor({ markdown, base = '../', resolve, onChange, 
       const box = renderMarkdown(`@[youtube](${m[1]})`).firstChild; insertBlockEl(box);
     });
   }
+
+  /* ----- drag a block (picture, video, paragraph...) to a new place ----- */
+  const dropLine = h('div', { class: 'drop-line', hidden: true });
+  function startMove(blk, e0) {
+    deselectUi();
+    root.appendChild(dropLine); dropLine.hidden = false; blk.classList.add('moving'); root.classList.add('is-moving');
+    let target = blk.nextSibling;
+    const scroller = document.querySelector('.main');
+    const mv = (e) => {
+      const kids = [...ed.children].filter((k) => k !== blk); let before = null;
+      for (const k of kids) { const r = k.getBoundingClientRect(); if (e.clientY < r.top + r.height / 2) { before = k; break; } }
+      target = before;
+      const rr = root.getBoundingClientRect(), last = kids[kids.length - 1];
+      const y = before ? before.getBoundingClientRect().top - 4 : (last ? last.getBoundingClientRect().bottom + 4 : rr.top);
+      dropLine.style.top = (y - rr.top) + 'px';
+      if (scroller) { if (e.clientY < 110) scroller.scrollTop -= 14; else if (e.clientY > innerHeight - 90) scroller.scrollTop += 14; }
+    };
+    const up = () => {
+      document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up);
+      dropLine.hidden = true; blk.classList.remove('moving'); root.classList.remove('is-moving');
+      if (target !== blk.nextSibling && target !== blk) { ed.insertBefore(blk, target); prep(); emit(); if (blk.tagName === 'FIGURE') selectFig(blk); }
+    };
+    document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
+    mv(e0);
+  }
+  function deselectUi() { if (figUi) { figUi.remove(); figUi = null; } }
+  ed.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || !e.target.closest) return;
+    const hitEl = e.target.closest('figure img, .video');
+    if (!hitEl || e.target.closest('.fig-ui')) return;
+    const blk = hitEl.closest('figure, .video'), x0 = e.clientX, y0 = e.clientY;
+    const clean = () => { document.removeEventListener('pointermove', pm); document.removeEventListener('pointerup', clean); };
+    const pm = (ev) => { if (Math.hypot(ev.clientX - x0, ev.clientY - y0) > 6) { clean(); startMove(blk, ev); } };
+    document.addEventListener('pointermove', pm); document.addEventListener('pointerup', clean);
+  });
+  /* grip shown at the left of whichever block the mouse is over */
+  const grip = h('button', { type: 'button', class: 'blk-grip', 'aria-label': 'Drag to move this block', title: 'Drag to move', hidden: true }, icon('grip', 16));
+  let gripBlk = null;
+  ed.addEventListener('mousemove', (e) => {
+    if (sourceMode || root.classList.contains('is-moving')) return;
+    let n = e.target; while (n && n.parentNode !== ed) n = n.parentNode;
+    if (!n || n === gripBlk) return;
+    if (n.nodeName === 'P' && !n.textContent.trim()) { grip.hidden = true; gripBlk = null; return; }
+    gripBlk = n; const rr = root.getBoundingClientRect(), br = n.getBoundingClientRect();
+    grip.hidden = false; grip.style.top = (br.top - rr.top + 6) + 'px'; grip.style.left = '14px';
+  });
+  const hideGrip = () => { if (!root.classList.contains('is-moving')) { grip.hidden = true; gripBlk = null; } };
+  grip.addEventListener('pointerdown', (e) => { if (e.button !== 0 || !gripBlk) return; e.preventDefault(); const b2 = gripBlk; grip.hidden = true; startMove(b2, e); });
+  document.addEventListener('pointerup', () => { gripBlk = null; });
 
   /* ----- bubble toolbar over selected text ----- */
   const keepAnchor = () => { const r = rangeNow(); anchor = r ? topBlock(r.endContainer) : null; };
@@ -300,8 +353,6 @@ export function createVisualEditor({ markdown, base = '../', resolve, onChange, 
     b(null, '❝', 'Quote', () => fmtBlock('blockquote')),
     b(null, 'Center', 'Centre the paragraph', () => { const r = rangeNow(); const blk = r && topBlock(r.startContainer); if (blk && blk.nodeName === 'P') { blk.classList.toggle('center'); emit(); } }),
     b('link', '', 'Link', link), b(null, 'Code', 'Code', () => toggleWrap('code')),
-    b(null, '—', 'Divider line', () => insertBlockEl(document.createElement('hr'))), sep(),
-    b('image', 'Photo', 'Add a photo (opens the photo editor)', () => { keepAnchor(); onPhoto(null); }), b('folder', 'Library', 'Your uploaded photos', () => { keepAnchor(); onLibrary(); }), b(null, '▶ Video', 'YouTube video', () => { keepAnchor(); addVideo(); }),
     h('span', { class: 'grow' }),
     b('code', 'Source', 'Switch between visual and Markdown source', () => toggleSource()));
   function refreshState() { tbs.forEach(([el, st]) => { let on = false; try { on = rangeNow() ? st() : false; } catch (e) { /* ignore */ } el.classList.toggle('on', on); }); }
@@ -317,12 +368,21 @@ export function createVisualEditor({ markdown, base = '../', resolve, onChange, 
   src.hidden = true;
   src.addEventListener('input', () => onChange(src.value));
 
-  const root = h('div', { class: 've-wrap' }, toolbar, ed, src, bubble, plus);
+  const root = h('div', { class: 've-wrap' }, toolbar, ed, src, bubble, plus, grip, dropLine);
+  root.addEventListener('mouseleave', hideGrip);
   return {
     el: root,
     insertPhoto(path, alt) { if (sourceMode) { src.value += `\n\n![${alt || ''}](${path})\n`; onChange(src.value); return; } insertBlockEl(renderMarkdown(`![${alt || ''}](${path})`, { base, resolve }).firstChild); },
     markdown: () => (sourceMode ? src.value : toMarkdown(ed)),
     destroy() { document.removeEventListener('selectionchange', onSel); document.removeEventListener('pointerdown', outside); window.removeEventListener('resize', placeUi); },
+    items: ITEMS.map((it) => ({ group: it[0], label: it[1], hint: it[2], glyph: it[3] })),
+    addBlock(label) {
+      const it = ITEMS.find((i) => i[1] === label); if (!it) return;
+      if (sourceMode) return toast('Switch back from Source mode first.', 'warn');
+      let blk = curEmpty();
+      if (!blk) { const r = rangeNow(); const ref = r ? topBlock(r.endContainer) : ed.lastChild; blk = h('p', null, h('br')); ed.insertBefore(blk, ref ? ref.nextSibling : null); }
+      it[4](blk);
+    },
     replacePhoto(fig, path) { const img = fig.querySelector('img'); if (!img) return; img.dataset.path = path; img.src = (resolve && resolve(path)) || base + path; emit(); },
     focusEnd,
   };
