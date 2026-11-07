@@ -18,7 +18,7 @@ All text lives in `data/*.json`, so nothing needs code edits:
 | `data/posts.json` | blog posts (Markdown, drafts) |
 | `data/content.json` | every heading, caption and paragraph of the home story, page headings and intros, nav labels, footer, button labels |
 
-Open `/dashboard/` (new, dark and light themes, visual blog editor, import all GitHub repos). The classic `/admin/` still works. See `ADMIN.md` for setup. Tabs: Overview, Profile, Skills, Projects, Blog, Page text, Raw JSON, Security. **Raw JSON** edits any data file directly.
+Open `/dashboard/` (new, dark and light themes, visual blog editor, import all GitHub repos). See `ADMIN.md` for setup. Tabs: Overview, Profile, Skills, Projects, Blog, Page text, Raw JSON, Security. **Raw JSON** edits any data file directly.
 
 Things that stay in code (change the files by hand): the 3D scene, colours and layout (`css/manga.css`), the link-preview image (`og-image.png`) and the meta tags in each page head.
 
@@ -26,7 +26,7 @@ Things that stay in code (change the files by hand): the 3D scene, colours and l
 - `index.html` the scroll film; its text is the fallback if data fails to load.
 - `skills.html`, `projects.html`, `blog.html`, `connect.html` content pages (rendered by `js/pages.js`).
 - `privacy.html`, `404.html` standalone pages.
-- `admin/index.html`, `css/admin.css`, `js/admin.js`, `js/config.js` classic dashboard.
+- `admin/index.html` only redirects old bookmarks to `/dashboard/`; `js/config.js` holds the owner/repo settings.
 - `dashboard/index.html`, `css/dash.css`, `js/dash/*.js` new dashboard (v2).
 - `js/content.js` applies `content.json`; `js/hydrate.js` fills the home page; `js/md.js` safe Markdown (also photos, YouTube, underline, highlight, font styles); `js/blog-editor.js` dashboard toolbar and photo editor; `assets/blog/` photos uploaded from the dashboard; `js/dom.js` helpers (no `innerHTML` anywhere).
 - `js/main.js`, `world.js`, `director.js`, `ui.js`, `path.js`, `shaders.js` the 3D film; `js/vendor/three.bundle.js` Three.js r186.

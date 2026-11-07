@@ -204,3 +204,23 @@ code{font-family:'JetBrains Mono',monospace}
   .ve{padding:16px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* fixes: card footer overflow, link styling */
+.pcard h4{margin:0;font-size:16px}
+.pcard>.clamp{flex:1}
+.pc-foot{flex-wrap:wrap}
+.pc-foot a{flex:1 1 100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);text-decoration:none;font-size:13px}
+.pc-foot a:hover{color:var(--accent2)}
+.pc-foot .btn{flex:none}
+.pc-foot .grow{flex:1 1 0;min-width:0}
+.pc-top .btn.on{border-color:var(--accent);color:var(--accent)}
+.row .t{min-width:0}
+.btn span{overflow:hidden;text-overflow:ellipsis}
+.search-in{position:relative;flex:1;max-width:340px}
+.search-in svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search-in input{padding-left:34px}
+.inline{display:inline-flex;gap:6px;align-items:center}.inline input{width:auto}
+.acc[open]>summary{margin-bottom:10px}.acc>.form,.acc>.stack{padding-bottom:6px}
+.acc .fld{margin-bottom:10px}
+.repo .grow small,.repo .grow b{display:block}
+.repo .grow{min-width:0}.repo .grow small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

@@ -129,7 +129,7 @@ function projects() {
         iconBtn('star', p.featured ? 'Featured (click to remove)' : 'Not featured (click to feature)', () => { p.featured = !p.featured; changed(); paint(); }, p.featured ? 'on' : '')),
       h('h4', null, p.title || 'Untitled'), h('p', { class: 'muted clamp' }, p.desc || 'No description'),
       h('div', { class: 'tags' }, ...(p.tech || []).slice(0, 5).map((t) => h('span', { class: 'tag' }, t))),
-      h('div', { class: 'pc-foot' }, p.url ? h('a', { class: 'muted', href: isHttps(p.url) ? p.url : '#', target: '_blank', rel: 'noopener noreferrer' }, p.url.replace('https://', '').slice(0, 34)) : h('span', { class: 'muted' }, 'No link'),
+      h('div', { class: 'pc-foot' }, p.url ? h('a', { class: 'muted', href: isHttps(p.url) ? p.url : '#', target: '_blank', rel: 'noopener noreferrer' }, p.url.replace('https://', '')) : h('span', { class: 'muted' }, 'No link'),
         h('span', { class: 'grow' }), btn('Edit', { icon: 'edit', onClick: () => editProject(p, paint) }),
         iconBtn('trash', 'Delete project', async () => { if (await confirmBox('Delete project', `Delete "${p.title}"?`, 'Delete', true)) { d.splice(i, 1); changed(); paint(); } }, 'danger')))));
     if (!term) dragList(list, (f, t) => { moveArr(d, f, t); changed(); paint(); });
