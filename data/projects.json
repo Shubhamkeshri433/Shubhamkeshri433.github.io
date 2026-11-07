@@ -81,5 +81,21 @@
     ],
     "url": "https://github.com/Shubhamkeshri433/To-Do-in-Excel",
     "featured": false
+  },
+  {
+    "id": "us-honey-visualisation-practice",
+    "title": "US Honey Visualisation Practice",
+    "badge": "Jupyter Notebook",
+    "desc": "A hands-on Python visualisation practice project using the US honey production dataset.",
+    "tech": [
+      "Jupyter Notebook",
+      "matplotlib",
+      "matplotlib-figures",
+      "matplotlib-pyplot",
+      "matplotlib-python",
+      "pandas"
+    ],
+    "url": "https://github.com/Shubhamkeshri433/US-Honey-Visualisation-Practice",
+    "featured": false
   }
 ]
