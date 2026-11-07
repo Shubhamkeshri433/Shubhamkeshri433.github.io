@@ -38,6 +38,14 @@ function inline(text, parent) {
   if (last < text.length) parent.appendChild(document.createTextNode(text.slice(last)));
 }
 
+/* Picture and video size/position, written after the item as {w=50,a=left}. w: 10-100 (percent of the page width), a: left | right (omit for centred). Applied with data attributes and the width style only. */
+function boxAttrs(el, str) {
+  const m = {}; String(str || '').split(',').forEach((kv) => { const p = kv.split('='); if (p.length === 2) m[p[0].trim()] = p[1].trim(); });
+  const w = Math.min(100, Math.max(10, parseInt(m.w, 10) || 100));
+  if (w < 100) { el.dataset.w = String(w); el.style.width = w + '%'; }
+  if (m.a === 'left' || m.a === 'right') el.dataset.a = m.a;
+}
+
 function ytId(v) {
   const m = /^(?:https?:\/\/(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?(?:[^#\s]*&)?v=|embed\/|shorts\/)|youtu\.be\/))?([A-Za-z0-9_-]{11})(?:[?&#\/][^\s]*)?$/.exec(v.trim());
   return m ? m[1] : null;
@@ -60,7 +68,7 @@ export function renderMarkdown(src, opts) {
       const pre = document.createElement('pre'), code = document.createElement('code');
       code.textContent = buf.join('\n'); pre.appendChild(code); frag.appendChild(pre); continue;
     }
-    const im = /^!\[([^\]]*)\]\(([^)\s]+)\)(?:\{w=(\d{2,3})\})?\s*$/.exec(line);
+    const im = /^!\[([^\]]*)\]\(([^)\s]+)\)(?:\{([^}]*)\})?\s*$/.exec(line);
     if (im) {
       flush(); i++;
       if (SAFE_IMG.test(im[2])) {
@@ -68,15 +76,14 @@ export function renderMarkdown(src, opts) {
         const local = OPTS.resolve && OPTS.resolve(im[2]);
         img.src = local || (/^https:/.test(im[2]) ? im[2] : (OPTS.base || '') + im[2]);
         img.alt = im[1]; img.loading = 'lazy'; img.decoding = 'async'; img.dataset.path = im[2];
-        const wp = im[3] ? Math.min(100, Math.max(10, +im[3])) : 100;
-        if (wp < 100) { fig.dataset.w = String(wp); fig.style.width = wp + '%'; fig.style.marginLeft = fig.style.marginRight = 'auto'; }
+        boxAttrs(fig, im[3]);
         fig.appendChild(img);
         if (im[1]) { const fc = document.createElement('figcaption'); fc.textContent = im[1]; fig.appendChild(fc); }
         frag.appendChild(fig);
       }
       continue;
     }
-    const yt = /^@\[youtube\]\(([^)\s]+)\)\s*$/.exec(line);
+    const yt = /^@\[youtube\]\(([^)\s]+)\)(?:\{([^}]*)\})?\s*$/.exec(line);
     if (yt) {
       flush(); i++;
       const id = ytId(yt[1]);
@@ -86,7 +93,7 @@ export function renderMarkdown(src, opts) {
         f.src = 'https://www.youtube-nocookie.com/embed/' + id; f.title = 'YouTube video'; f.loading = 'lazy';
         f.allow = 'accelerometer; encrypted-media; picture-in-picture'; f.referrerPolicy = 'strict-origin-when-cross-origin';
         f.setAttribute('allowfullscreen', ''); f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
-        box.dataset.yt = id; box.appendChild(f); frag.appendChild(box);
+        box.dataset.yt = id; boxAttrs(box, yt[2]); box.appendChild(f); frag.appendChild(box);
       }
       continue;
     }

@@ -268,8 +268,19 @@ function blog() {
       (() => { const pv = h('div', { class: 'sp' }, h('div', { class: 'sp-url' }, 'shubhamkeshri433.github.io › blog'), h('div', { class: 'sp-t' }), h('div', { class: 'sp-d' })); const up = () => { pv.querySelector('.sp-t').textContent = p.title || 'Untitled post'; pv.querySelector('.sp-d').textContent = (p.summary || 'Add a summary to control this text.').slice(0, 160) + ((p.summary || '').length > 160 ? '…' : ''); }; up(); pv.update = up; setTimeout(() => { const root = pv.closest('.blog-grid'); if (root) root.addEventListener('input', up); }, 0); return h('div', { class: 'fld' }, h('label', null, 'Search preview'), pv, h('small', null, 'Keep the summary under 160 characters.')); })(),
       h('div', { class: 'stack-btns' }, btn('Preview', { icon: 'eye', onClick: () => previewPost(p) }), btn('Delete post', { icon: 'trash', kind: 'danger', onClick: async () => { if (await confirmBox('Delete post', `Delete "${p.title || 'this post'}"?`, 'Delete', true)) { d.splice(S.postIdx, 1); changed(); rerender(); } } })));
   } else { center = h('div', { class: 'editor-col' }, empty('No posts yet.', btn('Write your first post', { kind: 'primary', icon: 'plus', onClick: newPost }))); side = h('div'); }
-  return h('div', { class: 'page wide-page' }, head('Blog', `${d.length} posts. Write it here exactly as it will look on the site.`, btn('New post', { icon: 'plus', kind: 'primary', onClick: newPost })),
-    h('div', { class: 'blog-grid' }, h('div', { class: 'left-col' }, h('aside', { class: 'card plist-card' }, h('h3', null, h('span', null, 'Posts')), list), leftExtra), center, side));
+  const pref = { get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } } };
+  const fold = (card, key) => {
+    const hd = card.querySelector('h3'), b2 = h('button', { type: 'button', class: 'fold', 'aria-label': 'Minimize or open this panel', title: 'Minimize / open' });
+    const paint = () => { const c = card.classList.contains('collapsed'); b2.textContent = c ? '▸' : '▾'; b2.setAttribute('aria-expanded', String(!c)); };
+    if (pref.get(key) === '0') card.classList.add('collapsed');
+    b2.addEventListener('click', () => { card.classList.toggle('collapsed'); pref.set(key, card.classList.contains('collapsed') ? '0' : '1'); paint(); });
+    hd.appendChild(b2); paint(); return card;
+  };
+  const postsCard = fold(h('aside', { class: 'card plist-card' }, h('h3', null, h('span', null, 'Posts')), list), 'sk_dash_posts');
+  if (leftExtra) fold(leftExtra, 'sk_dash_blocks');
+  const grid = h('div', { class: 'blog-grid' + (pref.get('sk_dash_left') === '0' ? ' left-off' : '') }, h('div', { class: 'left-col' }, postsCard, leftExtra), center, side);
+  const panelBtn = btn(grid.classList.contains('left-off') ? 'Show panels' : 'Hide panels', { icon: 'menu', onClick: () => { const off = grid.classList.toggle('left-off'); pref.set('sk_dash_left', off ? '0' : '1'); panelBtn.lastChild.textContent = off ? 'Show panels' : 'Hide panels'; } });
+  return h('div', { class: 'page wide-page' }, head('Blog', `${d.length} posts. Write it here exactly as it will look on the site.`, panelBtn, btn('New post', { icon: 'plus', kind: 'primary', onClick: newPost })), grid);
 }
 
 /* ---------- media ---------- */

@@ -51,3 +51,5 @@ The dashboard lives at `/dashboard/` (https://shubhamkeshri433.github.io/dashboa
 - Press `+` on an empty line, or type `/`, to add an image, photo from your library, video, heading, list, quote, code block or divider.
 - Click a picture to drag its corners, or use Small / Medium / Full. The width is saved in the post as `{w=50}` after the image.
 - Image studio: move and resize the crop box, rotate, flip, adjust, pick the width, quality and format (WebP, JPEG, PNG), and see the file size before you upload.
+- Drag a picture or video sideways: drop it in the left or right third to place it there, and the text wraps around it. Drop it in the middle for a centred block. The Left / Center / Right buttons do the same. Videos can be resized too. Saved as `{w=50,a=left}` after the item; phones always show them full width.
+- The side panels (Posts, Add blocks) can be minimized, or hidden with Hide panels to give the editor the full width.

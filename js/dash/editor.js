@@ -45,12 +45,18 @@ function blocks(root) {
     else if (t === 'HR') out.push('---');
     else if (t === 'FIGURE') {
       const img = n.querySelector('img'), path = img && img.dataset.path;
-      if (path) { const cap = (n.querySelector('figcaption') || { textContent: '' }).textContent.replace(/[\[\]\n]/g, ' ').trim(); const wp = parseInt(n.dataset.w, 10); out.push(`![${cap}](${path})${wp && wp < 100 ? `{w=${wp}}` : ''}`); }
-    } else if (t === 'DIV' && n.dataset.yt) out.push(`@[youtube](${n.dataset.yt})`);
+      if (path) { const cap = (n.querySelector('figcaption') || { textContent: '' }).textContent.replace(/[\[\]\n]/g, ' ').trim(); out.push(`![${cap}](${path})${boxStr(n)}`); }
+    } else if (t === 'DIV' && n.dataset.yt) out.push(`@[youtube](${n.dataset.yt})${boxStr(n)}`);
     else out.push(...blocks(n));
   });
   if (run.length) flushInline(run);
   return out;
+}
+function boxStr(n) {
+  const w = parseInt(n.dataset.w, 10), a = n.dataset.a, p = [];
+  if (w && w < 100) p.push('w=' + w);
+  if (a === 'left' || a === 'right') p.push('a=' + a);
+  return p.length ? '{' + p.join(',') + '}' : '';
 }
 export const toMarkdown = (root) => blocks(root).join('\n\n');
 
@@ -85,42 +91,46 @@ export function createVisualEditor({ markdown, base = '../', resolve, onChange, 
     if (figUi) { figUi.remove(); figUi = null; }
     ed.querySelectorAll('.sel').forEach((n) => n.classList.remove('sel')); selFig = null;
   }
-  const setWidth = (fig, pct) => {
-    pct = Math.round(Math.min(100, Math.max(10, pct)));
-    if (pct >= 100) { delete fig.dataset.w; fig.style.removeProperty('width'); } else { fig.dataset.w = String(pct); fig.style.width = pct + '%'; fig.style.marginLeft = fig.style.marginRight = 'auto'; }
-    placeUi(); emit();
+  /* width (percent) and position (left / centre / right) of a picture or video */
+  const applyBox = (el, w, a) => {
+    if (w != null) { w = Math.round(Math.min(100, Math.max(10, w))); if (w >= 100) { delete el.dataset.w; el.style.removeProperty('width'); } else { el.dataset.w = String(w); el.style.width = w + '%'; } }
+    if (a !== undefined) { if (a === 'left' || a === 'right') el.dataset.a = a; else delete el.dataset.a; }
   };
+  const setWidth = (fig, pct) => { applyBox(fig, pct); placeUi(); emit(); };
+  const setAlign = (fig, a) => { applyBox(fig, a !== 'center' && !fig.dataset.w ? 50 : null, a === 'center' ? '' : a); placeUi(); emit(); };
   function placeUi() {
     if (!figUi || !selFig) return;
-    const img = selFig.querySelector('img'); if (!img) return;
-    figUi.style.height = img.offsetHeight + 'px';
-    const wpx = Math.round(img.getBoundingClientRect().width), nat = img.naturalWidth;
+    const el = selFig.querySelector('img') || selFig;
+    figUi.style.height = el.offsetHeight + 'px';
+    const wpx = Math.round(el.getBoundingClientRect().width), nat = el.naturalWidth;
     figUi.querySelector('.fig-badge').textContent = `${wpx} px wide · ${selFig.dataset.w || 100}%${nat ? ' · photo ' + nat + ' px' : ''}`;
-    figUi.querySelectorAll('.fig-sz').forEach((b) => b.classList.toggle('on', (+(selFig.dataset.w || 100)) === +b.dataset.pct));
+    figUi.querySelectorAll('.fig-sz').forEach((b2) => b2.classList.toggle('on', (+(selFig.dataset.w || 100)) === +b2.dataset.pct));
+    figUi.querySelectorAll('.fig-al').forEach((b2) => b2.classList.toggle('on', (selFig.dataset.a || 'center') === b2.dataset.pos));
+    /* keep the small toolbar clear of the page toolbar: above the picture if there is room, else below it */
+    const bar = figUi.querySelector('.fig-bar'), rr = root.getBoundingClientRect(), tbr = toolbar.getBoundingClientRect(), fr = el.getBoundingClientRect();
+    const bw = bar.offsetWidth, bh = bar.offsetHeight, above = fr.top - bh - 12 > tbr.bottom;
+    bar.style.top = (above ? -bh - 10 : el.offsetHeight + 10) + 'px';
+    bar.style.left = (Math.max(rr.left + 6, Math.min(rr.right - bw - 6, fr.left + fr.width / 2 - bw / 2)) - fr.left) + 'px';
   }
   function startResize(e, side) {
     e.preventDefault(); e.stopPropagation();
     const fig = selFig, hd = e.currentTarget, cs = getComputedStyle(ed);
     const edW = ed.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-    const startW = fig.getBoundingClientRect().width, x0 = e.clientX, dir = side.includes('w') ? -1 : 1;
+    const startW = fig.getBoundingClientRect().width, x0 = e.clientX, dir = side.includes('w') ? -1 : 1, fac = fig.dataset.a ? 1 : 2;
     try { hd.setPointerCapture(e.pointerId); } catch (er) { /* ignore */ }
     fig.classList.add('resizing');
-    const mv = (ev) => setWidthLive(fig, ((startW + dir * (ev.clientX - x0) * 2) / edW) * 100);
+    const mv = (ev) => { applyBox(fig, ((startW + dir * (ev.clientX - x0) * fac) / edW) * 100); placeUi(); };
     const up = () => { hd.removeEventListener('pointermove', mv); hd.removeEventListener('pointerup', up); hd.removeEventListener('pointercancel', up); fig.classList.remove('resizing'); emit(); };
     hd.addEventListener('pointermove', mv); hd.addEventListener('pointerup', up); hd.addEventListener('pointercancel', up);
   }
-  function setWidthLive(fig, pct) {
-    pct = Math.round(Math.min(100, Math.max(10, pct)));
-    if (pct >= 100) { delete fig.dataset.w; fig.style.removeProperty('width'); } else { fig.dataset.w = String(pct); fig.style.width = pct + '%'; fig.style.marginLeft = fig.style.marginRight = 'auto'; }
-    placeUi();
-  }
   function selectFig(fig) {
     deselect(); selFig = fig; fig.classList.add('sel');
-    if (fig.tagName !== 'FIGURE') return;
-    const tb = (label, fn, cls = '') => { const b = h('button', { type: 'button', class: 'fig-btn ' + cls }, label); b.addEventListener('mousedown', (ev) => ev.preventDefault()); b.addEventListener('click', (ev) => { ev.stopPropagation(); fn(); }); return b; };
-    const sizes = [[50, 'Small'], [75, 'Medium'], [100, 'Full']].map(([v, l]) => { const b = tb(l, () => setWidth(fig, v), 'fig-sz'); b.dataset.pct = String(v); return b; });
-    const bar = h('div', { class: 'fig-bar', role: 'toolbar', 'aria-label': 'Picture' }, ...sizes, h('span', { class: 'tsep' }),
-      tb('Edit photo', () => onEditPhoto && onEditPhoto(fig.querySelector('img'), fig)), tb('Replace', () => onPhoto(null, fig)), h('span', { class: 'tsep' }),
+    const isPic = fig.tagName === 'FIGURE';
+    const tb = (label, fn, cls = '') => { const b2 = h('button', { type: 'button', class: 'fig-btn ' + cls }, label); b2.addEventListener('mousedown', (ev) => ev.preventDefault()); b2.addEventListener('click', (ev) => { ev.stopPropagation(); fn(); }); return b2; };
+    const sizes = [[50, 'Small'], [75, 'Medium'], [100, 'Full']].map(([v, l]) => { const b2 = tb(l, () => setWidth(fig, v), 'fig-sz'); b2.dataset.pct = String(v); return b2; });
+    const aligns = [['left', 'Left'], ['center', 'Center'], ['right', 'Right']].map(([v, l]) => { const b2 = tb(l, () => setAlign(fig, v), 'fig-al'); b2.dataset.pos = v; return b2; });
+    const bar = h('div', { class: 'fig-bar', role: 'toolbar', 'aria-label': isPic ? 'Picture' : 'Video' }, ...sizes, h('span', { class: 'tsep' }), ...aligns, h('span', { class: 'tsep' }),
+      ...(isPic ? [tb('Edit photo', () => onEditPhoto && onEditPhoto(fig.querySelector('img'), fig)), tb('Replace', () => onPhoto(null, fig)), h('span', { class: 'tsep' })] : []),
       tb('Delete', () => { deselect(); fig.remove(); prep(); emit(); }, 'danger'));
     figUi = h('div', { class: 'fig-ui', contenteditable: 'false' }, bar, h('div', { class: 'fig-badge' }),
       ...['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].map((sd) => { const hd = h('div', { class: 'fig-h fig-' + sd }); hd.addEventListener('pointerdown', (ev) => startResize(ev, sd === 'n' || sd === 's' ? 'e' : sd)); return hd; }));
@@ -185,24 +195,42 @@ export function createVisualEditor({ markdown, base = '../', resolve, onChange, 
 
   /* ----- drag a block (picture, video, paragraph...) to a new place ----- */
   const dropLine = h('div', { class: 'drop-line', hidden: true });
+  const ghost = h('div', { class: 'drop-ghost', hidden: true });
   function startMove(blk, e0) {
     deselectUi();
-    root.appendChild(dropLine); dropLine.hidden = false; blk.classList.add('moving'); root.classList.add('is-moving');
-    let target = blk.nextSibling;
+    const media = blk.tagName === 'FIGURE' || blk.classList.contains('video');
+    root.appendChild(dropLine); root.appendChild(ghost); dropLine.hidden = false; blk.classList.add('moving'); root.classList.add('is-moving');
+    const r0 = blk.getBoundingClientRect(), ratio = r0.width ? r0.height / r0.width : 0.56, cs = getComputedStyle(ed);
+    let target = blk.nextSibling, zone = blk.dataset.a || 'center';
     const scroller = document.querySelector('.main');
     const mv = (e) => {
-      const kids = [...ed.children].filter((k) => k !== blk); let before = null;
+      const kids = [...ed.children].filter((k) => k !== blk && !k.classList.contains('moving')); let before = null;
       for (const k of kids) { const r = k.getBoundingClientRect(); if (e.clientY < r.top + r.height / 2) { before = k; break; } }
       target = before;
       const rr = root.getBoundingClientRect(), last = kids[kids.length - 1];
       const y = before ? before.getBoundingClientRect().top - 4 : (last ? last.getBoundingClientRect().bottom + 4 : rr.top);
       dropLine.style.top = (y - rr.top) + 'px';
+      if (media) {
+        const er = ed.getBoundingClientRect(), cl = er.left + parseFloat(cs.paddingLeft), cw = er.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        const f = (e.clientX - cl) / cw; zone = f < 0.34 ? 'left' : f > 0.66 ? 'right' : 'center';
+        if (zone === 'center') ghost.hidden = true;
+        else {
+          const gw = cw * ((+blk.dataset.w || 50) / 100);
+          ghost.hidden = false; ghost.textContent = zone === 'left' ? 'Text wraps on the right' : 'Text wraps on the left';
+          ghost.style.width = gw + 'px'; ghost.style.height = Math.max(40, gw * ratio) + 'px'; ghost.style.top = (y - rr.top + 6) + 'px';
+          ghost.style.left = ((zone === 'left' ? cl : cl + cw - gw) - rr.left) + 'px';
+        }
+      }
       if (scroller) { if (e.clientY < 110) scroller.scrollTop -= 14; else if (e.clientY > innerHeight - 90) scroller.scrollTop += 14; }
     };
     const up = () => {
       document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up);
-      dropLine.hidden = true; blk.classList.remove('moving'); root.classList.remove('is-moving');
-      if (target !== blk.nextSibling && target !== blk) { ed.insertBefore(blk, target); prep(); emit(); if (blk.tagName === 'FIGURE') selectFig(blk); }
+      dropLine.hidden = true; ghost.hidden = true; blk.classList.remove('moving'); root.classList.remove('is-moving');
+      const moved = target !== blk.nextSibling && target !== blk;
+      if (moved) ed.insertBefore(blk, target);
+      if (media && zone !== (blk.dataset.a || 'center')) applyBox(blk, zone !== 'center' && !blk.dataset.w ? 50 : null, zone === 'center' ? '' : zone);
+      if (moved || media) { prep(); emit(); }
+      if (media) selectFig(blk);
     };
     document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
     mv(e0);
