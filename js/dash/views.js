@@ -96,16 +96,15 @@ function profile() {
 /* ---------- skills ---------- */
 function skills() {
   const d = D('skills');
-  const list = h('div', { class: 'stack' });
+  const list = h('div', { class: 'skill-grid' });
   d.forEach((c, i) => {
     c.items = c.items || [];
-    list.appendChild(h('div', { class: 'item' }, h('div', { class: 'item-head' }, gripEl(), h('div', { class: 'grow' }, fld('Category', c, 'category')),
-      h('div', { class: 'item-actions' }, i > 0 ? iconBtn('up', 'Move up', () => { moveArr(d, i, i - 1); changed(); rerender(); }) : null, i < d.length - 1 ? iconBtn('down', 'Move down', () => { moveArr(d, i, i + 1); changed(); rerender(); }) : null,
-        iconBtn('trash', 'Delete category', async () => { if (await confirmBox('Delete category', `Delete "${c.category || 'this category'}" and its skills?`, 'Delete', true)) { d.splice(i, 1); changed(); rerender(); } }, 'danger'))),
+    list.appendChild(h('div', { class: 'skill-card' }, h('div', { class: 'sk-head' }, gripEl(), h('div', { class: 'grow' }, fld('Category', c, 'category')),
+      iconBtn('trash', 'Delete category', async () => { if (await confirmBox('Delete category', `Delete "${c.category || 'this category'}" and its skills?`, 'Delete', true)) { d.splice(i, 1); changed(); rerender(); } }, 'danger')),
       chips('Skills', c.items, (v) => (c.items = v), 'Add a skill, press Enter')));
   });
   dragList(list, (f, t) => { moveArr(d, f, t); changed(); rerender(); });
-  return h('div', { class: 'page' }, head('Skills', 'Grouped by what they are for. Drag the handle to reorder.', btn('Add category', { icon: 'plus', kind: 'primary', onClick: () => { d.push({ category: '', items: [] }); changed(); rerender(); } })),
+  return h('div', { class: 'page' }, head('Skills', 'Grouped by what they are for. Drag the handle on a card to reorder.', btn('Add category', { icon: 'plus', kind: 'primary', onClick: () => { d.push({ category: '', items: [] }); changed(); rerender(); } })),
     d.length ? list : empty('No skills yet.'));
 }
 

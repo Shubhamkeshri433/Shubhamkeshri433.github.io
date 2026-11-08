@@ -53,3 +53,11 @@ The dashboard lives at `/dashboard/` (https://shubhamkeshri433.github.io/dashboa
 - Image studio: move and resize the crop box, rotate, flip, adjust, pick the width, quality and format (WebP, JPEG, PNG), and see the file size before you upload.
 - Drag a picture or video sideways: drop it in the left or right third to place it there, and the text wraps around it. Drop it in the middle for a centred block. The Left / Center / Right buttons do the same. Videos can be resized too. Saved as `{w=50,a=left}` after the item; phones always show them full width.
 - Blog opens on a list of posts; pick one to edit. The editor uses the full width. Add block and Settings open on demand, and the left menu collapses to icons with the button next to search.
+
+## How safe is the dashboard?
+
+- The dashboard page is public, but it is only a screen. Nothing can be changed without your GitHub token, and the token must belong to `Shubhamkeshri433` and be able to write to this repository. Anyone else who opens `/dashboard/` just sees a sign-in box.
+- The passphrase is not a login on a server. It only locks the token on your own device (AES-256, key made with PBKDF2, 310,000 rounds). A stranger on the internet cannot guess it, because there is nothing online to guess against. Use 10+ characters anyway.
+- Make the token as small as possible: fine-grained, only this repository, only "Contents: Read and write", and an expiry of 30 to 90 days. If it ever leaks, delete it in GitHub settings and nothing else is exposed.
+- Do not tick "remember on this device" on a shared or public computer. Press Lock when you leave.
+- The page has a strict content security policy, builds everything without `innerHTML`, and refuses to load inside another website's frame.
