@@ -156,6 +156,18 @@ export async function saveFile(n, message) {
   }
 }
 
+/* sitemap.xml lists the published posts, so search engines find new ones */
+export async function saveSitemap() {
+  const B = `https://${CONFIG.owner.toLowerCase()}.github.io/`, esc = (u) => u.replace(/&/g, '&amp;');
+  const urls = [[B], [B + 'projects.html'], [B + 'skills.html'], [B + 'blog.html'], [B + 'connect.html'],
+    ...(S.files.posts.data || []).filter((p) => !p.draft && p.slug).map((p) => [B + 'blog.html?post=' + encodeURIComponent(p.slug), p.date])];
+  const xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls.map(([u, d]) => `  <url><loc>${esc(u)}</loc>${d ? `<lastmod>${d}</lastmod>` : ''}</url>\n`).join('') + '</urlset>\n';
+  let sha;
+  try { const cur = await gh(`${repoPath}/contents/sitemap.xml?ref=${encodeURIComponent(CONFIG.branch)}`); if (fromB64(cur.content) === xml) return; sha = cur.sha; } catch (e) { /* not there yet */ }
+  const body = { message: 'Dashboard: update sitemap.xml', content: toB64(xml), branch: CONFIG.branch }; if (sha) body.sha = sha;
+  await gh(`${repoPath}/contents/sitemap.xml`, { method: 'PUT', body: JSON.stringify(body) });
+}
+
 /* ---------- history ---------- */
 export async function listCommits(path, n = 20) {
   const q = new URLSearchParams({ sha: CONFIG.branch, per_page: String(n) });

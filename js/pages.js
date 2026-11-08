@@ -40,6 +40,8 @@ const pages = {
       const p = all.find((x) => x.slug === slug);
       if (!p) return root.appendChild(h('section', { class: 'sec full' }, h('h2', null, 'Post not found'), h('p', null, 'That post does not exist or is not published.'), h('a', { class: 'btn btn-alt', href: 'blog.html' }, 'All posts')));
       document.title = `${p.title} — Shubham Keshri`;
+      const md = document.querySelector('meta[name="description"]'); if (md && p.summary) md.setAttribute('content', p.summary);
+      const cl = document.querySelector('link[rel="canonical"]'); if (cl) cl.setAttribute('href', 'https://shubhamkeshri433.github.io/blog.html?post=' + encodeURIComponent(p.slug));
       const body = h('div', { class: 'prose' }); body.appendChild(renderMarkdown(p.body));
       root.classList.add('single');
       return root.appendChild(h('article', { class: 'sec full' },
