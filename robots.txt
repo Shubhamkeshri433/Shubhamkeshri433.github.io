@@ -1,2 +1,4 @@
 User-agent: *
 Disallow: /dashboard/
+
+Sitemap: https://shubhamkeshri433.github.io/sitemap.xml

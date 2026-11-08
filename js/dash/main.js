@@ -4,6 +4,7 @@ import { icon, btn, iconBtn, modal, diffView, fld, changed } from './ui.js';
 
 /* never run inside someone else's frame (clickjacking); GitHub Pages cannot send frame-ancestors */
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Dashboard cannot run in a frame'); }
+import { saveSitemap } from './core.js';
 import { VIEWS, validate, go, newPost, importRepos } from './views.js';
 
 initTheme();
@@ -133,6 +134,7 @@ function reviewModal() {
       b.disabled = true; status.className = 'msg'; status.textContent = 'Saving…';
       try {
         for (const n of names) await saveFile(n, o.msg || undefined);
+        if (names.includes('posts')) { try { await saveSitemap(); } catch (x) { toast('Saved, but sitemap.xml could not be updated: ' + x.message, 'warn', 7000); } }
         m.close(); toast('Saved. Your site will update in about a minute.'); render();
       } catch (er) { status.className = 'msg err'; status.textContent = er.message; }
     } })] });
