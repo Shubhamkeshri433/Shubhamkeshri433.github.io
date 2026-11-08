@@ -1,6 +1,9 @@
 /* Dashboard v2: sign-in, shell (sidebar, top bar, search), router, review-and-save. */
 import { CONFIG, h, clear, S, FILES, initTheme, toggleTheme, toast, hasVault, vaultOpen, vaultSave, vaultForget, failDelay, verifyToken, lock, touch, loadAll, dirty, dirtyNames, saveFile, restoreDraft, dropDraft, pagesStatus, ago } from './core.js';
 import { icon, btn, iconBtn, modal, diffView, fld, changed } from './ui.js';
+
+/* never run inside someone else's frame (clickjacking); GitHub Pages cannot send frame-ancestors */
+if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('Dashboard cannot run in a frame'); }
 import { VIEWS, validate, go, newPost, importRepos } from './views.js';
 
 initTheme();

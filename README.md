@@ -28,7 +28,7 @@ Things that stay in code (change the files by hand): the 3D scene, colours and l
 - `privacy.html`, `404.html` standalone pages.
 - `js/config.js` holds the owner/repo settings.
 - `dashboard/index.html`, `css/dash.css`, `js/dash/*.js` new dashboard (v2).
-- `js/content.js` applies `content.json`; `js/hydrate.js` fills the home page; `js/md.js` safe Markdown (also photos, YouTube, underline, highlight, font styles); `js/blog-editor.js` dashboard toolbar and photo editor; `assets/blog/` photos uploaded from the dashboard; `js/dom.js` helpers (no `innerHTML` anywhere).
+- `js/content.js` applies `content.json`; `js/hydrate.js` fills the home page; `js/md.js` safe Markdown (also photos, YouTube, underline, highlight, font styles); `assets/blog/` photos uploaded from the dashboard; `js/dom.js` helpers (no `innerHTML` anywhere).
 - `js/main.js`, `world.js`, `director.js`, `ui.js`, `path.js`, `shaders.js` the 3D film; `js/vendor/three.bundle.js` Three.js r186.
 - `og-image.png` link preview, `favicon-32.png`, `favicon-192.png`, `favicon.ico`, `apple-touch-icon.png` tab icons (the SK logo), `robots.txt`.
 

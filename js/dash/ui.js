@@ -160,7 +160,7 @@ export function dragList(container, onMove) {
   [...container.children].forEach((item, i) => {
     const grip = item.querySelector('.grip');
     if (grip) {
-      grip.addEventListener('mousedown', () => { item.draggable = true; });
+      grip.addEventListener('mousedown', () => { item.draggable = true; }); grip.addEventListener('mouseup', () => { item.draggable = false; });
       item.addEventListener('dragend', () => { item.draggable = false; item.classList.remove('dragging'); container.querySelectorAll('.over').forEach((e) => e.classList.remove('over')); });
     }
     item.addEventListener('dragstart', (e) => { from = i; item.classList.add('dragging'); if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i)); } });
