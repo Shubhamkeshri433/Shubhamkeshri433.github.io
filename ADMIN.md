@@ -27,7 +27,7 @@ The dashboard lives at `/dashboard/` (https://shubhamkeshri433.github.io/dashboa
 - If a save says the file changed on GitHub, press **Reload from GitHub** and redo the edit.
 - When the token expires, make a new one and use "Use a different token".
 
-## Security model (honest version)
+## Security model
 - The page at `/dashboard/` is public, like any static page. Nobody can change anything without your token.
 - Sign-in checks the token's account is exactly the owner and that it can push to this repo; anything else is rejected.
 - The token is held in memory only, unless you choose to remember it (AES-GCM, key from your passphrase via PBKDF2 with 310,000 rounds). The dashboard locks after 15 idle minutes and clears everything from memory.
