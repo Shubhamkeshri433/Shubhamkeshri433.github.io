@@ -36,6 +36,8 @@ const ICONS = {
   code: 'M8 8l-5 4 5 4M16 8l5 4-5 4M14 5l-4 14',
   refresh: 'M20 12a8 8 0 10-2.5 5.8M20 5v7h-7',
   warn: 'M12 3l10 18H2L12 3zM12 10v5M12 18h.01',
+  back: 'M15 6l-6 6 6 6',
+  panel: 'M4 5h16v14H4zM9 5v14',
 };
 export function icon(name, size = 18) {
   const ns = 'http://www.w3.org/2000/svg';

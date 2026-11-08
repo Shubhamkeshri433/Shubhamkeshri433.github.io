@@ -196,7 +196,7 @@ async function importRepos() {
 function newPost() {
   const d = D('posts');
   d.unshift({ slug: '', title: '', date: new Date().toISOString().slice(0, 10), summary: '', tags: [], draft: true, body: '' });
-  S.postIdx = 0; changed(); rerender();
+  S.postIdx = 0; S.keepPost = true; changed(); rerender();
 }
 function photoFlow(file, ed, fig, srcImg) {
   const run = async (f, label, size) => {
@@ -246,21 +246,18 @@ function previewPost(p) {
 }
 function blog() {
   const d = D('posts');
-  if (S.postIdx == null || S.postIdx >= d.length) S.postIdx = 0;
-  const p = d[S.postIdx];
-  const list = h('div', { class: 'plist' }, ...d.map((x, i) => {
-    const b = h('button', { type: 'button', class: 'pl-item' + (i === S.postIdx ? ' on' : '') }, h('b', null, x.title || 'Untitled'), h('small', null, `${x.date || ''} · ${x.draft ? 'draft' : 'live'}`));
-    b.addEventListener('click', () => { S.postIdx = i; rerender(); }); return b;
-  }));
-  let center, side, leftExtra = null;
+  if (S.postIdx != null && S.postIdx >= d.length) S.postIdx = null;
+  const p = S.postIdx == null ? null : d[S.postIdx];
+  if (!p) return blogList(d);
+  let center, side, blocksPop = null;
   if (p) {
     const meta = h('div', { class: 'ed-meta' });
     const updMeta = () => { const w = (p.body || '').replace(/!\[[^\]]*\]\([^)]*\)(\{w=\d+\})?/g, ' ').replace(/[#*>`_~=\[\]()!{}:+-]/g, ' ').split(/\s+/).filter(Boolean).length; meta.textContent = `${p.date || 'No date'} · ${w} words · ${Math.max(1, Math.round(w / 200))} min read · ${p.draft ? 'Draft' : 'Published'}`; };
     updMeta();
     const ed = createVisualEditor({ markdown: p.body || '', base: '../', resolve: (x) => S.local[x], toast, onChange: (md) => { p.body = md; updMeta(); changed(); }, onPhoto: (f, fg) => photoFlow(f, ed, fg), onEditPhoto: (img, fg) => photoFlow(null, ed, fg, img), onLibrary: () => library(ed) });
     S.cleanup = () => ed.destroy();
-    leftExtra = h('aside', { class: 'card blocks-card' }, h('h3', null, h('span', null, 'Add blocks')), h('p', { class: 'muted bk-hint' }, 'Click to add at the cursor. Drag any picture, video or paragraph to move it.'),
-      h('div', { class: 'bk-grid' }, ...ed.items.map((it) => { const b = h('button', { type: 'button', class: 'bk' }, h('span', { class: 'bk-ic' }, ['image', 'folder', 'code'].includes(it.glyph) ? icon(it.glyph, 18) : h('span', { class: 'bm-glyph' }, it.glyph)), h('span', null, it.label)); b.addEventListener('mousedown', (e) => e.preventDefault()); b.addEventListener('click', () => ed.addBlock(it.label)); return b; })));
+    blocksPop = h('div', { class: 'pop hidden', role: 'menu' }, h('p', { class: 'muted bk-hint' }, 'Adds at the cursor. You can also drag any picture, video or paragraph to move it.'),
+      h('div', { class: 'bk-grid' }, ...ed.items.map((it) => { const b = h('button', { type: 'button', class: 'bk' }, h('span', { class: 'bk-ic' }, ['image', 'folder', 'code'].includes(it.glyph) ? icon(it.glyph, 18) : h('span', { class: 'bm-glyph' }, it.glyph)), h('span', null, it.label)); b.addEventListener('mousedown', (e) => e.preventDefault()); b.addEventListener('click', () => { blocksPop.classList.add('hidden'); ed.addBlock(it.label); }); return b; })));
     const slugEl = fld('Slug (web address)', p, 'slug', { hint: 'lowercase-with-dashes' });
     center = h('div', { class: 'editor-col' }, h('div', { class: 'title-in' }, (() => { const t = h('input', { type: 'text', value: p.title || '', placeholder: 'Post title', 'aria-label': 'Post title' }); t.addEventListener('input', () => { const auto = !p.slug || p.slug === slugify(prevT.get(p) || ''); p.title = t.value; const li = document.querySelector('.pl-item.on b'); if (li) li.textContent = t.value || 'Untitled'; if (auto) { p.slug = slugify(t.value); slugEl.querySelector('input').value = p.slug; } prevT.set(p, t.value); changed(); }); prevT.set(p, p.title); return t; })()), meta, ed.el);
     side = h('aside', { class: 'side card' }, h('h3', null, h('span', null, 'Post settings')), slugEl, fld('Date (YYYY-MM-DD)', p, 'date'), chips('Tags', p.tags = p.tags || [], (v) => (p.tags = v)),
@@ -269,18 +266,28 @@ function blog() {
       h('div', { class: 'stack-btns' }, btn('Preview', { icon: 'eye', onClick: () => previewPost(p) }), btn('Delete post', { icon: 'trash', kind: 'danger', onClick: async () => { if (await confirmBox('Delete post', `Delete "${p.title || 'this post'}"?`, 'Delete', true)) { d.splice(S.postIdx, 1); changed(); rerender(); } } })));
   } else { center = h('div', { class: 'editor-col' }, empty('No posts yet.', btn('Write your first post', { kind: 'primary', icon: 'plus', onClick: newPost }))); side = h('div'); }
   const pref = { get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } } };
-  const fold = (card, key) => {
-    const hd = card.querySelector('h3'), b2 = h('button', { type: 'button', class: 'fold', 'aria-label': 'Minimize or open this panel', title: 'Minimize / open' });
-    const paint = () => { const c = card.classList.contains('collapsed'); b2.textContent = c ? '▸' : '▾'; b2.setAttribute('aria-expanded', String(!c)); };
-    if (pref.get(key) === '0') card.classList.add('collapsed');
-    b2.addEventListener('click', () => { card.classList.toggle('collapsed'); pref.set(key, card.classList.contains('collapsed') ? '0' : '1'); paint(); });
-    hd.appendChild(b2); paint(); return card;
-  };
-  const postsCard = fold(h('aside', { class: 'card plist-card' }, h('h3', null, h('span', null, 'Posts')), list), 'sk_dash_posts');
-  if (leftExtra) fold(leftExtra, 'sk_dash_blocks');
-  const grid = h('div', { class: 'blog-grid' + (pref.get('sk_dash_left') === '0' ? ' left-off' : '') }, h('div', { class: 'left-col' }, postsCard, leftExtra), center, side);
-  const panelBtn = btn(grid.classList.contains('left-off') ? 'Show panels' : 'Hide panels', { icon: 'menu', onClick: () => { const off = grid.classList.toggle('left-off'); pref.set('sk_dash_left', off ? '0' : '1'); panelBtn.lastChild.textContent = off ? 'Show panels' : 'Hide panels'; } });
-  return h('div', { class: 'page wide-page' }, head('Blog', `${d.length} posts. Write it here exactly as it will look on the site.`, panelBtn, btn('New post', { icon: 'plus', kind: 'primary', onClick: newPost })), grid);
+  const grid = h('div', { class: 'blog-grid' + (pref.get('sk_dash_settings') === '1' ? '' : ' settings-off') }, center, side);
+  const setBtn = btn('Settings', { icon: 'gear', onClick: () => { const off = grid.classList.toggle('settings-off'); pref.set('sk_dash_settings', off ? '0' : '1'); setBtn.classList.toggle('on', !off); } });
+  setBtn.classList.toggle('on', !grid.classList.contains('settings-off'));
+  const blkBtn = btn('Add block', { icon: 'plus' });
+  blkBtn.addEventListener('mousedown', (e) => e.preventDefault());
+  blkBtn.addEventListener('click', () => blocksPop.classList.toggle('hidden'));
+  const off = (e) => { if (!blocksPop.isConnected) return document.removeEventListener('mousedown', off); if (!blocksPop.contains(e.target) && !blkBtn.contains(e.target)) blocksPop.classList.add('hidden'); };
+  document.addEventListener('mousedown', off);
+  const stat = h('button', { type: 'button', class: 'chip-status st-chip ' + (p.draft ? 'warn' : 'ok'), title: 'Click to switch between Draft and Published' }, p.draft ? 'Draft' : 'Published');
+  stat.addEventListener('click', () => { p.draft = !p.draft; changed(); rerender(); });
+  const back = btn('All posts', { icon: 'back', onClick: () => { S.postIdx = null; rerender(); } });
+  return h('div', { class: 'page wide-page ed-page' }, h('div', { class: 'ed-head' }, back, h('span', { class: 'grow' }), stat, h('div', { class: 'pop-wrap' }, blkBtn, blocksPop), btn('Preview', { icon: 'eye', onClick: () => previewPost(p) }), setBtn), grid);
+}
+function blogList(d) {
+  const open = (i) => { S.postIdx = i; rerender(); };
+  const cards = d.map((x, i) => {
+    const c = h('button', { type: 'button', class: 'post-card' }, h('span', { class: 'chip-status ' + (x.draft ? 'warn' : 'ok') }, x.draft ? 'Draft' : 'Published'), h('b', null, x.title || 'Untitled'), h('small', null, x.date || 'No date'),
+      x.summary ? h('p', null, x.summary.length > 140 ? x.summary.slice(0, 140) + '…' : x.summary) : null, (x.tags || []).length ? h('div', { class: 'pc-tags' }, ...x.tags.slice(0, 4).map((t) => h('span', null, t))) : null);
+    c.addEventListener('click', () => open(i)); return c;
+  });
+  return h('div', { class: 'page' }, head('Blog', d.length ? `${d.length} post${d.length === 1 ? '' : 's'}. Pick one to edit, or start a new one.` : 'Nothing here yet.', btn('New post', { icon: 'plus', kind: 'primary', onClick: newPost })),
+    d.length ? h('div', { class: 'post-grid' }, ...cards) : empty('No posts yet.', btn('Write your first post', { kind: 'primary', icon: 'plus', onClick: newPost })));
 }
 
 /* ---------- media ---------- */
