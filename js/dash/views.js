@@ -138,7 +138,7 @@ function projects() {
   paint();
   return h('div', { class: 'page' }, head('Projects', `${d.length} projects. Drag to reorder, star to show on the home page.`,
     btn('Import from GitHub', { icon: 'github', onClick: importRepos }),
-    btn('Add project', { icon: 'plus', kind: 'primary', onClick: () => { const p = { id: '', title: '', badge: '', desc: '', tech: [], url: 'https://', featured: false }; d.unshift(p); changed(); paint(); editProject(p, paint); } })),
+    btn('Add project', { icon: 'plus', kind: 'primary', onClick: () => { const p = { id: '', title: '', badge: '', desc: '', tech: [], url: 'https://', featured: false }; d.unshift(p); changed(); paint(); editProject(p, () => { if (!(p.title || '').trim() && !(p.desc || '').trim()) { const k = d.indexOf(p); if (k >= 0) d.splice(k, 1); changed(); } paint(); }); } })),
     h('div', { class: 'toolbar-row' }, h('div', { class: 'search-in' }, icon('search', 16), q)), list);
 }
 function editProject(p, after) {
