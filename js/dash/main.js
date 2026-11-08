@@ -61,7 +61,10 @@ S.refreshBar = refreshBar;
 
 function route() {
   const t = (location.hash.match(/^#\/(\w+)/) || [])[1];
-  S.tab = VIEWS.some((v) => v[0] === t) ? t : (S.tab || 'overview');
+  const nt = VIEWS.some((v) => v[0] === t) ? t : (S.tab || 'overview');
+  if (nt === 'blog' && S.tab !== 'blog' && !S.keepPost) S.postIdx = null;
+  S.keepPost = false;
+  S.tab = nt;
 }
 function render() {
   if (!S.token) return;
@@ -74,7 +77,7 @@ function render() {
   const nav = h('nav', { class: 'side', 'aria-label': 'Sections' }, h('div', { class: 'brand' }, logo(34), h('div', null, h('b', null, 'SK Dashboard'), h('small', null, CONFIG.owner))));
   VIEWS.forEach(([id, title, ic, , section]) => {
     if (section && section !== lastSection) { nav.appendChild(h('div', { class: 'nav-sec' }, section)); lastSection = section; }
-    const a = h('a', { href: '#/' + id, class: 'nav' + (S.tab === id ? ' on' : '') }, icon(ic, 18), h('span', null, title), c[id] != null ? h('em', { 'data-count': id }, String(c[id])) : null);
+    const a = h('a', { href: '#/' + id, title, class: 'nav' + (S.tab === id ? ' on' : '') }, icon(ic, 18), h('span', null, title), c[id] != null ? h('em', { 'data-count': id }, String(c[id])) : null);
     a.addEventListener('click', () => document.body.classList.remove('drawer'));
     nav.appendChild(a);
   });
@@ -90,7 +93,11 @@ function render() {
   searchBtn.addEventListener('click', palette);
   const burger = iconBtn('menu', 'Menu', () => document.body.classList.toggle('drawer'));
   burger.classList.add('burger');
-  const top = h('header', { class: 'top' }, burger, searchBtn, h('span', { class: 'grow' }), live, chip, iconBtn('sun', 'Switch light / dark theme', () => toggleTheme()), review, save);
+  const navKey = 'sk_dash_nav';
+  try { document.body.classList.toggle('nav-min', localStorage.getItem(navKey) === '0'); } catch (e) { /* ignore */ }
+  const navBtn = iconBtn('panel', 'Collapse or open the side menu', () => { const m = document.body.classList.toggle('nav-min'); try { localStorage.setItem(navKey, m ? '0' : '1'); } catch (e) { /* ignore */ } });
+  navBtn.classList.add('nav-toggle');
+  const top = h('header', { class: 'top' }, burger, navBtn, searchBtn, h('span', { class: 'grow' }), live, chip, iconBtn('sun', 'Switch light / dark theme', () => toggleTheme()), review, save);
   bar = { chip, review, save };
 
   const view = VIEWS.find((v) => v[0] === S.tab)[3];
@@ -139,7 +146,7 @@ window.addEventListener('hashchange', () => { if (S.token) render(); });
 function palette() {
   const items = [
     ...VIEWS.map((v) => ({ t: v[1], k: 'Go to', ic: v[2], run: () => go(v[0]) })),
-    ...D('posts').map((p, i) => ({ t: p.title || 'Untitled', k: 'Post', ic: 'pen', run: () => { S.postIdx = i; go('blog'); } })),
+    ...D('posts').map((p, i) => ({ t: p.title || 'Untitled', k: 'Post', ic: 'pen', run: () => { S.postIdx = i; S.keepPost = true; go('blog'); } })),
     ...D('projects').map((p) => ({ t: p.title, k: 'Project', ic: 'folder', run: () => go('projects') })),
     { t: 'New post', k: 'Action', ic: 'plus', run: () => { S.tab = 'blog'; go('blog'); newPost(); } },
     { t: 'Import repos from GitHub', k: 'Action', ic: 'github', run: () => { go('projects'); importRepos(); } },
