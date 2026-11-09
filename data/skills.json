@@ -23,13 +23,15 @@
   {
     "category": "Data Analytics & BI",
     "items": [
-      "Power BI",
-      "Excel",
-      "Pandas",
       "NumPy",
+      "Pandas",
       "Matplotlib",
-      "DAX",
-      "KPI Dashboards"
+      "Seaborn",
+      "Power BI",
+      "Dax",
+      "Data Modelling",
+      "KPI & Dashboards",
+      "Advance Excel"
     ]
   },
   {
