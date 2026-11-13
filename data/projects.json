@@ -1,5 +1,19 @@
 [
   {
+    "id": "zighost",
+    "title": "Zighost",
+    "badge": "Application",
+    "desc": "Minecraft server management: Zighost brings everything you need to manage, monitor and control your servers into one Windows desktop app",
+    "tech": [
+      "Python",
+      "JavaScript",
+      "Css",
+      "Html"
+    ],
+    "url": "https://github.com/Shubhamkeshri433/Zighost",
+    "featured": true
+  },
+  {
     "id": "ai-resume-ranker",
     "title": "AI Resume Ranker",
     "badge": "AI & NLP System",
